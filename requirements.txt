@@ -1,0 +1,11 @@
+streamlit
+google-adk
+google-generativeai
+firebase-admin
+pandas
+openpyxl
+fpdf2
+bcrypt
+python-dotenv
+Pillow
+python-magic

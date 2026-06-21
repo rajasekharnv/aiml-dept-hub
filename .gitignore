@@ -1,0 +1,16 @@
+.streamlit/secrets.toml
+firebase-credentials.json
+*.json
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+kaggle.json
+.antigravity/
+.agents-cli-spec.md
+*.lock
+CACHEDIR.TAG
+pyvenv.cfg
