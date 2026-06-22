@@ -187,6 +187,7 @@ def render_hod_dashboard():
                     col_idx = i % 4
                     with cols[col_idx]:
                         if st.button(f"👉 {name}", key=f"global_jump_{col_key}_{i}", use_container_width=True):
+                            st.session_state["hod_selected_collection_select"] = col_key
                             st.session_state["hod_selected_collection"] = col_key
                             st.session_state["hod_search_query_input"] = name
                             st.rerun()
@@ -219,6 +220,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All FDPs →", key="view_fdps_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "faculty_fdp"
             st.session_state["hod_selected_collection"] = "faculty_fdp"
             st.rerun()
             
@@ -230,6 +232,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All Publications →", key="view_pubs_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "faculty_publications"
             st.session_state["hod_selected_collection"] = "faculty_publications"
             st.rerun()
             
@@ -241,6 +244,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All Workshops →", key="view_wks_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "faculty_workshops"
             st.session_state["hod_selected_collection"] = "faculty_workshops"
             st.rerun()
             
@@ -253,6 +257,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All Hackathons →", key="view_hacks_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "student_hackathons"
             st.session_state["hod_selected_collection"] = "student_hackathons"
             st.rerun()
             
@@ -264,6 +269,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All Competitions →", key="view_comps_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "student_competitions"
             st.session_state["hod_selected_collection"] = "student_competitions"
             st.rerun()
             
@@ -275,6 +281,7 @@ def render_hod_dashboard():
             </div>
         """, unsafe_allow_html=True)
         if st.button("View All Certifications →", key="view_certs_metric_btn", use_container_width=True):
+            st.session_state["hod_selected_collection_select"] = "student_certifications"
             st.session_state["hod_selected_collection"] = "student_certifications"
             st.rerun()
 
