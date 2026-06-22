@@ -86,7 +86,7 @@ st.markdown("""
     
     /* Card design */
     .glass-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 16px;
         padding: 1.5rem;
@@ -129,6 +129,118 @@ st.markdown("""
         background: rgba(168, 85, 247, 0.15);
         color: #a855f7;
         border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    /* Streamlit Metrics Override */
+    [data-testid="metric-container"] {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 16px !important;
+        padding: 20px 24px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    [data-testid="metric-container"]:hover {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border-color: rgba(56, 189, 248, 0.4) !important;
+        transform: translateY(-4px) !important;
+        box-shadow: 0 12px 40px 0 rgba(56, 189, 248, 0.15) !important;
+    }
+    [data-testid="stMetricValue"] {
+        font-size: 2.2rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        color: #94a3b8 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08rem !important;
+    }
+
+    /* Buttons Override */
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%) !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 10px 24px !important;
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    button[kind="primary"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
+        opacity: 0.95 !important;
+    }
+    button[kind="secondary"] {
+        background: rgba(255, 255, 255, 0.03) !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 10px 24px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    button[kind="secondary"]:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        color: #38bdf8 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Form Fields Override */
+    div[data-baseweb="input"], div[data-baseweb="select"], textarea {
+        background-color: rgba(255, 255, 255, 0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        transition: all 0.3s ease !important;
+    }
+    div[data-baseweb="input"]:focus-within, div[data-baseweb="select"]:focus-within, textarea:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 1px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.25) !important;
+    }
+
+    /* Tab bar override */
+    button[data-baseweb="tab"] {
+        color: #94a3b8 !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        border-bottom: 2px solid transparent !important;
+        padding-bottom: 8px !important;
+    }
+    button[data-baseweb="tab"]:hover {
+        color: #38bdf8 !important;
+    }
+    button[aria-selected="true"] {
+        color: #38bdf8 !important;
+        border-bottom: 2px solid #38bdf8 !important;
+    }
+
+    /* Sidebar Background & Border */
+    [data-testid="stSidebar"] {
+        background-color: #0b0d19 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+    }
+    
+    /* Expander Override */
+    div[data-testid="stExpander"] {
+        background: rgba(255, 255, 255, 0.01) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: 1rem !important;
+        transition: border-color 0.3s ease !important;
+    }
+    div[data-testid="stExpander"]:hover {
+        border-color: rgba(56, 189, 248, 0.2) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -194,21 +306,85 @@ def check_title_duplicate(collection: str, key_state: str):
 
 
 # --- DASHBOARD: HOD ---
+# --- DASHBOARD: HOD ---
 def render_hod_dashboard():
     require_auth(allowed_roles=["HoD"])
     
-    if st.button("🔄 Refresh Data"):
-        st.cache_data.clear()
-        st.rerun()
-        
-    st.write(f"Welcome, **{st.session_state.user_display_name}** | Role: **Head of Department (HoD)**")
+    # 1. Custom Premium Welcome Banner
+    st.markdown(f"""
+        <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%); 
+                    border: 1px solid rgba(255, 255, 255, 0.05); 
+                    border-radius: 16px; padding: 24px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <h2 style="margin: 0px; font-weight: 800; color: #f1f5f9;">Welcome, {st.session_state.user_display_name} 👋</h2>
+                <p style="margin: 5px 0px 0px 0px; color: #94a3b8; font-size: 0.95rem;">
+                    Role: <span style="color: #f43f5e; font-weight: bold;">Head of Department (HoD)</span> | Department of AIML
+                </p>
+            </div>
+            <div style="font-size: 2.5rem; filter: drop-shadow(0 4px 10px rgba(56,189,248,0.2));">📊</div>
+        </div>
+    """, unsafe_allow_html=True)
     
-    # ----------------------------------------------------
-    # GLOBAL SEARCH (FEATURE 4)
-    # ----------------------------------------------------
+    # 2. Live Metrics Section
     import utils.db as db
+    from utils.db import get_all_records
+    from utils.db import (FACULTY_FDP, FACULTY_PUBLICATIONS, 
+        FACULTY_WORKSHOPS, STUDENT_HACKATHONS, 
+        STUDENT_COMPETITIONS, STUDENT_CERTIFICATIONS)
+    from utils.audit import log_event
+    from utils.export import export_to_pdf, export_to_excel, generate_pdf_report, generate_excel_report, export_my_records_excel
+
+    @st.cache_data(ttl=30)
+    def get_live_counts():
+        counts = {}
+        collections = {
+            "FDP": FACULTY_FDP,
+            "Publications": FACULTY_PUBLICATIONS, 
+            "Workshops": FACULTY_WORKSHOPS,
+            "Hackathons": STUDENT_HACKATHONS,
+            "Competitions": STUDENT_COMPETITIONS,
+            "Certifications": STUDENT_CERTIFICATIONS
+        }
+        for label, col in collections.items():
+            records = get_all_records(col)
+            counts[label] = len(records)
+        return counts
+
+    counts = get_live_counts()
+
+    # Preserve variables for visual charts and features
+    fdp_count = counts.get("FDP", 0)
+    pub_count = counts.get("Publications", 0)
+    wks_count = counts.get("Workshops", 0)
+    hack_count = counts.get("Hackathons", 0)
+    comp_count = counts.get("Competitions", 0)
+    cert_count = counts.get("Certifications", 0)
+
+    # Metric header and refresh button
+    metric_hdr_col, refresh_btn_col = st.columns([5, 1])
+    with metric_hdr_col:
+        st.markdown("### 📈 Live Department Metrics")
+    with refresh_btn_col:
+        if st.button("🔄 Refresh Data", key="hod_top_refresh_btn", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+
+    # Show metrics in 3x2 grid
+    col1, col2, col3 = st.columns(3)
+    col1.metric("📚 FDPs", fdp_count)
+    col2.metric("📄 Publications", pub_count)
+    col3.metric("🔧 Workshops", wks_count)
+
+    col4, col5, col6 = st.columns(3)
+    col4.metric("💻 Hackathons", hack_count)
+    col5.metric("🏆 Competitions", comp_count)
+    col6.metric("📜 Certifications", cert_count)
+
+    st.markdown("---")
+
+    # 3. Global Search Section
     st.markdown("### 🔍 Global Search (Across All Collections)")
-    global_search = st.text_input("Enter Faculty or Student Name to search across all databases:", key="hod_global_search_input")
+    global_search = st.text_input("Enter Faculty or Student Name to search across all databases:", key="hod_global_search_input", placeholder="Type name...")
     
     if global_search.strip():
         search_term = global_search.strip().lower()
@@ -239,7 +415,6 @@ def render_hod_dashboard():
                 col_label = collections_map[col_key]
                 st.markdown(f"**{col_label} ({len(matches)} matches)**")
                 
-                # Extract unique matching names
                 unique_names = list(set(
                     str(r.get("faculty_name") or r.get("student_name") or r.get("student") or "Unknown")
                     for r in matches
@@ -256,108 +431,135 @@ def render_hod_dashboard():
         else:
             st.info("No matching records found across any collections.")
         st.markdown("---")
+
+    # 4. Visual Analytics side-by-side
+    st.markdown("### 📊 Visual Analytics & Trends")
     
-    # ----------------------------------------------------
-    # SECTION 1 — Live Metrics
-    # ----------------------------------------------------
-    import utils.db as db
-    from utils.db import get_all_records
-    from utils.db import (FACULTY_FDP, FACULTY_PUBLICATIONS, 
-        FACULTY_WORKSHOPS, STUDENT_HACKATHONS, 
-        STUDENT_COMPETITIONS, STUDENT_CERTIFICATIONS)
-    from utils.audit import log_event
-    from utils.export import export_to_pdf, export_to_excel, generate_pdf_report, generate_excel_report, export_my_records_excel
-
-    @st.cache_data(ttl=30)
-    def get_live_counts():
-        counts = {}
-        collections = {
-            "FDP": FACULTY_FDP,
-            "Publications": FACULTY_PUBLICATIONS, 
-            "Workshops": FACULTY_WORKSHOPS,
-            "Hackathons": STUDENT_HACKATHONS,
-            "Competitions": STUDENT_COMPETITIONS,
-            "Certifications": STUDENT_CERTIFICATIONS
-        }
-        for label, col in collections.items():
-            records = get_all_records(col)
-            counts[label] = len(records)
-            print(f"HoD Dashboard: {label} = {len(records)} records")
-        return counts
-
-    counts = get_live_counts()
-
-    # Preserve variables for down-stream visual charts and features
-    fdp_count = counts.get("FDP", 0)
-    pub_count = counts.get("Publications", 0)
-    wks_count = counts.get("Workshops", 0)
-    hack_count = counts.get("Hackathons", 0)
-    comp_count = counts.get("Competitions", 0)
-    cert_count = counts.get("Certifications", 0)
-
-    # Show metrics
-    col1, col2, col3 = st.columns(3)
-    col1.metric("📚 FDPs", fdp_count)
-    col2.metric("📄 Publications", pub_count)
-    col3.metric("🔧 Workshops", wks_count)
-
-    col4, col5, col6 = st.columns(3)
-    col4.metric("💻 Hackathons", hack_count)
-    col5.metric("🏆 Competitions", comp_count)
-    col6.metric("📜 Certifications", cert_count)
-
-    # Add refresh button
-    if st.button("🔄 Refresh Data", key="hod_refresh_data_btn"):
-        st.cache_data.clear()
-        st.rerun()
-
-    # Add raw data viewer for HoD
-    with st.expander("🔍 Browse All Records"):
-        selected = st.selectbox("Select Collection", 
-            ["FDP", "Publications", "Workshops", 
-             "Hackathons", "Competitions", "Certifications"])
-        
-        collection_map = {
-            "FDP": FACULTY_FDP,
-            "Publications": FACULTY_PUBLICATIONS,
-            "Workshops": FACULTY_WORKSHOPS,
-            "Hackathons": STUDENT_HACKATHONS,
-            "Competitions": STUDENT_COMPETITIONS,
-            "Certifications": STUDENT_CERTIFICATIONS
-        }
-        
-        records = get_all_records(collection_map[selected])
-        if records:
-            df = pd.DataFrame(records)
-            st.dataframe(df, use_container_width=True)
+    chart_col1, chart_col2 = st.columns(2)
+    with chart_col1:
+        with st.container(border=True):
+            st.markdown("#### 📚 Faculty Activity Overview")
+            faculty_activity_df = pd.DataFrame({
+                "Activity Type": ["Faculty FDPs", "Research Publications", "Workshops / Seminars"],
+                "Submission Count": [fdp_count, pub_count, wks_count]
+            })
+            st.bar_chart(faculty_activity_df, x="Activity Type", y="Submission Count")
             
-            # Download button
-            import io
-            excel_buffer = io.BytesIO()
-            df_clean = sanitize_df_for_excel(df)
-            df_clean.to_excel(excel_buffer, index=False)
-            excel_data = excel_buffer.getvalue()
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("🔄 Refresh Faculty Chart", key="refresh_fac_chart"):
+                    st.rerun()
+            with c2:
+                fac_excel = export_to_excel(faculty_activity_df.to_dict("records"))
+                st.download_button(
+                    label="📥 Download Excel",
+                    data=fac_excel,
+                    file_name="faculty_activity_summary.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="dl_fac_chart_excel",
+                    use_container_width=True,
+                    on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Faculty Activity Chart Data")
+                )
+                
+    with chart_col2:
+        with st.container(border=True):
+            st.markdown("#### 🎓 Student Participation by Semester")
+            s_hack_recs = db.get_all_records("student_hackathons")
+            s_comp_recs = db.get_all_records("student_competitions")
             
+            semester_participation = {s: 0 for s in range(1, 9)}
+            for r in s_hack_recs:
+                try:
+                    sem = int(r.get("semester"))
+                    if 1 <= sem <= 8:
+                        semester_participation[sem] += 1
+                except (ValueError, TypeError):
+                    pass
+            for r in s_comp_recs:
+                try:
+                    sem = int(r.get("semester"))
+                    if 1 <= sem <= 8:
+                        semester_participation[sem] += 1
+                except (ValueError, TypeError):
+                    pass
+                    
+            student_sem_df = pd.DataFrame({
+                "Semester": [f"Semester {s}" for s in range(1, 9)],
+                "Participation Count": [semester_participation[s] for s in range(1, 9)]
+            })
+            st.bar_chart(student_sem_df, x="Semester", y="Participation Count")
+            
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("🔄 Refresh Semester Chart", key="refresh_sem_chart"):
+                    st.rerun()
+            with c2:
+                sem_excel = export_to_excel(student_sem_df.to_dict("records"))
+                st.download_button(
+                    label="📥 Download Excel",
+                    data=sem_excel,
+                    file_name="student_semester_participation.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="dl_sem_chart_excel",
+                    use_container_width=True,
+                    on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Student Semester Chart Data")
+                )
+                
+    with st.container(border=True):
+        st.markdown("#### 📈 Monthly Submission Timeline")
+        months_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        monthly_submission_counts = {m: 0 for m in months_list}
+        
+        all_cols = [
+            "faculty_fdp", "faculty_publications", "faculty_workshops",
+            "student_hackathons", "student_competitions", "student_certifications"
+        ]
+        for col in all_cols:
+            recs = db.get_all_records(col)
+            for r in recs:
+                c_at = r.get("created_at")
+                if c_at:
+                    if hasattr(c_at, "month"):
+                        m_idx = c_at.month - 1
+                    else:
+                        try:
+                            dt = datetime.fromisoformat(str(c_at))
+                            m_idx = dt.month - 1
+                        except Exception:
+                            continue
+                    monthly_submission_counts[months_list[m_idx]] += 1
+                    
+        academic_year_months = ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"]
+        timeline_df = pd.DataFrame({
+            "Month": academic_year_months,
+            "Submission Count": [monthly_submission_counts[m] for m in academic_year_months]
+        })
+        st.line_chart(timeline_df, x="Month", y="Submission Count")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("🔄 Refresh Timeline Chart", key="refresh_timeline_chart"):
+                st.rerun()
+        with c2:
+            timeline_excel = export_to_excel(timeline_df.to_dict("records"))
             st.download_button(
-                "⬇️ Download as Excel",
-                data=excel_data,
-                file_name=f"{selected}_records.xlsx",
+                label="📥 Download Excel",
+                data=timeline_excel,
+                file_name="monthly_submission_timeline.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key=f"dl_raw_hod_{selected}"
+                key="dl_timeline_chart_excel",
+                use_container_width=True,
+                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Timeline Chart Data")
             )
-        else:
-            st.info(f"No records found in {selected} collection")
 
-    # ----------------------------------------------------
-    # SECTION 2 — AI Report Generator
-    # ----------------------------------------------------
     st.markdown("---")
+
+    # 5. AI Report Generator
     st.markdown("### 🤖 AI Department Report Generator")
-    
     st.markdown("""
         <div style="background-color: rgba(56, 189, 248, 0.03); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-            <h4 style="margin-top: 0px; color: #38bdf8; font-weight: 600;">Ask anything about your department</h4>
-            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px;">Pose natural language questions regarding faculty activities, student publications, hackathons, or NAAC/NBA criteria summary reports. The Report Agent will fetch live data from Firestore to format your response.</p>
+            <h4 style="margin-top: 0px; color: #38bdf8; font-weight: 600;">Ask anything about your AIML department</h4>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px;">Pose natural language queries regarding faculty activities, student publications, hackathons, or criteria summary reports. The Report Agent will fetch live data to format your response.</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -417,7 +619,6 @@ def render_hod_dashboard():
             {"generated_by": st.session_state.user_display_name}
         )
         
-        # Fetch all collections for the department Excel report
         records_dict = {
             "FDP": db.get_all_records("faculty_fdp"),
             "Publications": db.get_all_records("faculty_publications"),
@@ -430,7 +631,6 @@ def render_hod_dashboard():
         
         act_col1, act_col2, act_col3 = st.columns(3)
         with act_col1:
-            # Detect whether generate_pdf_report returned real PDF or plain-text fallback
             _is_pdf = isinstance(pdf_bytes, (bytes, bytearray)) and pdf_bytes[:4] == b"%PDF"
             st.download_button(
                 label="📥 Download as PDF" if _is_pdf else "📥 Download Report (TXT)",
@@ -482,328 +682,199 @@ def render_hod_dashboard():
                 </script>
             """, height=42)
 
-    # ----------------------------------------------------
-    # SECTION 3 — Visual Analytics
-    # ----------------------------------------------------
+    # 6. Browse All Records & Management (Utility expanders at bottom)
     st.markdown("---")
-    st.markdown("### 📊 Visual Analytics & Trends")
-    
-    with st.expander("📊 Faculty Activity Overview", expanded=False):
-        faculty_activity_df = pd.DataFrame({
-            "Activity Type": ["Faculty FDPs", "Research Publications", "Workshops / Seminars"],
-            "Submission Count": [fdp_count, pub_count, wks_count]
-        })
-        st.bar_chart(faculty_activity_df, x="Activity Type", y="Submission Count")
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🔄 Refresh Faculty Chart", key="refresh_fac_chart"):
-                st.rerun()
-        with c2:
-            fac_excel = export_to_excel(faculty_activity_df.to_dict("records"))
-            st.download_button(
-                label="📥 Download Chart Data as Excel",
-                data=fac_excel,
-                file_name="faculty_activity_summary.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="dl_fac_chart_excel",
-                use_container_width=True,
-                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Faculty Activity Chart Data")
-            )
-            
-    with st.expander("📊 Student Participation by Semester", expanded=False):
-        s_hack_recs = db.get_all_records("student_hackathons")
-        s_comp_recs = db.get_all_records("student_competitions")
-        
-        semester_participation = {s: 0 for s in range(1, 9)}
-        for r in s_hack_recs:
-            try:
-                sem = int(r.get("semester"))
-                if 1 <= sem <= 8:
-                    semester_participation[sem] += 1
-            except (ValueError, TypeError):
-                pass
-        for r in s_comp_recs:
-            try:
-                sem = int(r.get("semester"))
-                if 1 <= sem <= 8:
-                    semester_participation[sem] += 1
-            except (ValueError, TypeError):
-                pass
-                
-        student_sem_df = pd.DataFrame({
-            "Semester": [f"Semester {s}" for s in range(1, 9)],
-            "Participation Count": [semester_participation[s] for s in range(1, 9)]
-        })
-        st.bar_chart(student_sem_df, x="Semester", y="Participation Count")
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🔄 Refresh Semester Chart", key="refresh_sem_chart"):
-                st.rerun()
-        with c2:
-            sem_excel = export_to_excel(student_sem_df.to_dict("records"))
-            st.download_button(
-                label="📥 Download Chart Data as Excel",
-                data=sem_excel,
-                file_name="student_semester_participation.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="dl_sem_chart_excel",
-                use_container_width=True,
-                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Student Semester Chart Data")
-            )
-            
-    with st.expander("📈 Monthly Submission Timeline", expanded=False):
-        months_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        monthly_submission_counts = {m: 0 for m in months_list}
-        
-        all_cols = [
-            "faculty_fdp", "faculty_publications", "faculty_workshops",
-            "student_hackathons", "student_competitions", "student_certifications"
-        ]
-        for col in all_cols:
-            recs = db.get_all_records(col)
-            for r in recs:
-                c_at = r.get("created_at")
-                if c_at:
-                    if hasattr(c_at, "month"):
-                        m_idx = c_at.month - 1
-                    else:
-                        try:
-                            dt = datetime.fromisoformat(str(c_at))
-                            m_idx = dt.month - 1
-                        except Exception:
-                            continue
-                    monthly_submission_counts[months_list[m_idx]] += 1
-                    
-        academic_year_months = ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"]
-        timeline_df = pd.DataFrame({
-            "Month": academic_year_months,
-            "Submission Count": [monthly_submission_counts[m] for m in academic_year_months]
-        })
-        st.line_chart(timeline_df, x="Month", y="Submission Count")
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🔄 Refresh Timeline Chart", key="refresh_timeline_chart"):
-                st.rerun()
-        with c2:
-            timeline_excel = export_to_excel(timeline_df.to_dict("records"))
-            st.download_button(
-                label="📥 Download Chart Data as Excel",
-                data=timeline_excel,
-                file_name="monthly_submission_timeline.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="dl_timeline_chart_excel",
-                use_container_width=True,
-                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, "Exported Timeline Chart Data")
-            )
-
-    # ----------------------------------------------------
-    # SECTION 4 — Browse All Records
-    # ----------------------------------------------------
-    st.markdown("---")
-    st.markdown("### 📂 Browse All Department Records")
-    
-    collections_map = {
-        "faculty_fdp": "Faculty FDPs",
-        "faculty_publications": "Research Publications",
-        "faculty_workshops": "Workshops / Seminars",
-        "student_hackathons": "Student Hackathons",
-        "student_competitions": "Student Competitions",
-        "student_certifications": "Course Certifications"
-    }
-    
-    default_idx = 0
-    if st.session_state.get("hod_selected_collection") in collections_map:
-        default_idx = list(collections_map.keys()).index(st.session_state["hod_selected_collection"])
-        
-    selected_col = st.selectbox(
-        "Select Department Collection:",
-        options=list(collections_map.keys()),
-        format_func=lambda x: collections_map[x],
-        index=default_idx,
-        key="hod_selected_collection_select"
-    )
-    
-    st.session_state["hod_selected_collection"] = selected_col
-    
-    # Feature 2 filter: Show All / Verified Only / Flagged Only / With Certificates
-    filter_option = st.radio(
-        "Filter Records:",
-        options=["Show All", "Verified Only", "Flagged Only", "With Certificates"],
-        horizontal=True,
-        key="hod_browse_filter_option"
-    )
-    
-    search_query = st.text_input("🔍 Search records by name (Faculty Name / Student Name / Speaker / Author):", key="hod_search_query_input")
-    
-    raw_records = db.get_all_records(selected_col)
-    
-    filtered_records = []
-    for r in raw_records:
-        match = True
-        if search_query.strip():
-            name_found = False
-            for field in ["faculty_name", "student_name", "author", "speaker", "student"]:
-                if field in r and r[field] and search_query.lower() in str(r[field]).lower():
-                    name_found = True
-                    break
-            if not name_found:
-                match = False
-                
-        # Filter option checking
-        if match:
-            if filter_option == "Verified Only" and not r.get("verified", False):
-                match = False
-            elif filter_option == "Flagged Only" and not r.get("flagged", False):
-                match = False
-            elif filter_option == "With Certificates" and not r.get("file_url"):
-                match = False
-                
-        if match:
-            filtered_records.append(r)
-            
-    if not filtered_records:
-        st.info("No matching records found in this collection.")
-    else:
-        df_browse = pd.DataFrame(filtered_records)
-        if "verified" not in df_browse.columns:
-            df_browse["verified"] = False
-        if "flagged" not in df_browse.columns:
-            df_browse["flagged"] = False
-            
-        column_config = {
-            "verified": st.column_config.CheckboxColumn("✓ Verified"),
-            "flagged": st.column_config.CheckboxColumn("🚩 Flagged")
+    with st.expander("📂 Browse All Department Records", expanded=False):
+        collections_map = {
+            "faculty_fdp": "Faculty FDPs",
+            "faculty_publications": "Research Publications",
+            "faculty_workshops": "Workshops / Seminars",
+            "student_hackathons": "Student Hackathons",
+            "student_competitions": "Student Competitions",
+            "student_certifications": "Course Certifications"
         }
-        if "file_url" in df_browse.columns:
-            column_config["file_url"] = st.column_config.LinkColumn("View Certificate", display_text="Open Link")
-            
-        st.dataframe(df_browse, column_config=column_config, use_container_width=True, hide_index=True)
         
-        st.markdown("#### 📄 Row-Level Actions (First 10 matches):")
-        for idx, r in enumerate(filtered_records[:10]):
-            ref_id = r.get("reference_id", "N/A")
-            title = r.get("title", "Untitled")
-            name_val = r.get("faculty_name") or r.get("student_name") or r.get("author") or r.get("speaker") or "Unknown"
-            file_url = r.get("file_url")
-            is_verified = r.get("verified", False)
-            is_flagged = r.get("flagged", False)
+        default_idx = 0
+        if st.session_state.get("hod_selected_collection") in collections_map:
+            default_idx = list(collections_map.keys()).index(st.session_state["hod_selected_collection"])
             
-            # Status badge icons in text
-            status_icons = ""
-            if is_verified:
-                status_icons += " <span style='color: #4ade80; font-weight: bold; margin-left: 5px;'>✓ Verified</span>"
-            if is_flagged:
-                status_icons += " <span style='color: #fbbf24; font-weight: bold; margin-left: 5px;'>🚩 Flagged</span>"
-                
-            col_info, col_verify, col_flag, col_view, col_dl = st.columns([3.5, 1.2, 1.2, 1.2, 1.2])
-            with col_info:
-                st.markdown(f"**{ref_id}** | {title} (by *{name_val}*){status_icons}", unsafe_allow_html=True)
-            with col_verify:
-                verified_val = st.toggle("Verify", value=is_verified, key=f"v_tgl_{selected_col}_{ref_id}")
-                if verified_val != is_verified:
-                    db.update_record(selected_col, r["doc_id"], {"verified": verified_val})
-                    log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Toggled verification for {ref_id} to {verified_val}")
-                    st.rerun()
-            with col_flag:
-                flag_label = "Unflag 🏳️" if is_flagged else "Flag 🚩"
-                if st.button(flag_label, key=f"f_btn_{selected_col}_{ref_id}", use_container_width=True):
-                    db.update_record(selected_col, r["doc_id"], {"flagged": not is_flagged})
-                    log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Toggled flag status for {ref_id} to {not is_flagged}")
-                    st.rerun()
-            with col_view:
-                if file_url:
-                    st.link_button("👁️ View", file_url, key=f"view_cert_{selected_col}_{idx}", use_container_width=True)
-                else:
-                    st.button("No Proof", key=f"no_cert_view_{selected_col}_{idx}", disabled=True, use_container_width=True)
-            with col_dl:
-                if file_url:
-                    st.link_button("📥 Download", file_url, key=f"dl_cert_{selected_col}_{idx}", use_container_width=True)
-                else:
-                    st.button("N/A", key=f"no_cert_dl_{selected_col}_{idx}", disabled=True, use_container_width=True)
-                    
-        st.markdown("---")
-        col_export_bytes = export_to_excel(filtered_records)
-        st.download_button(
-            label=f"📥 Export Entire {collections_map[selected_col]} Collection to Excel",
-            data=col_export_bytes,
-            file_name=f"aiml_dept_{selected_col}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            key="dl_entire_collection_btn",
-            use_container_width=True,
-            on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, f"Exported entire {selected_col} collection to Excel")
+        selected_col = st.selectbox(
+            "Select Department Collection:",
+            options=list(collections_map.keys()),
+            format_func=lambda x: collections_map[x],
+            index=default_idx,
+            key="hod_selected_collection_select"
         )
-
-    # ----------------------------------------------------
-    # SECTION 5 — Legacy Requests & Announcements (Functional Integrity)
-    # ----------------------------------------------------
-    st.markdown("---")
-    st.markdown("### 📢 Student Requests & Announcement Management")
-    
-    col_left, col_right = st.columns([2, 1])
-    
-    with col_left:
-        st.markdown("#### 📋 Student Requests Management")
-        if not st.session_state.requests:
-            st.info("No requests pending.")
+        
+        st.session_state["hod_selected_collection"] = selected_col
+        
+        filter_option = st.radio(
+            "Filter Records:",
+            options=["Show All", "Verified Only", "Flagged Only", "With Certificates"],
+            horizontal=True,
+            key="hod_browse_filter_option"
+        )
+        
+        search_query = st.text_input("🔍 Search records by name (Faculty Name / Student Name / Speaker / Author):", key="hod_search_query_input")
+        
+        raw_records = db.get_all_records(selected_col)
+        
+        filtered_records = []
+        for r in raw_records:
+            match = True
+            if search_query.strip():
+                name_found = False
+                for field in ["faculty_name", "student_name", "author", "speaker", "student"]:
+                    if field in r and r[field] and search_query.lower() in str(r[field]).lower():
+                        name_found = True
+                        break
+                if not name_found:
+                    match = False
+                    
+            if match:
+                if filter_option == "Verified Only" and not r.get("verified", False):
+                    match = False
+                elif filter_option == "Flagged Only" and not r.get("flagged", False):
+                    match = False
+                elif filter_option == "With Certificates" and not r.get("file_url"):
+                    match = False
+                    
+            if match:
+                filtered_records.append(r)
+                
+        if not filtered_records:
+            st.info("No matching records found in this collection.")
         else:
-            df_requests = pd.DataFrame(st.session_state.requests)
-            st.dataframe(df_requests, use_container_width=True)
+            df_browse = pd.DataFrame(filtered_records)
+            if "verified" not in df_browse.columns:
+                df_browse["verified"] = False
+            if "flagged" not in df_browse.columns:
+                df_browse["flagged"] = False
+                
+            column_config = {
+                "verified": st.column_config.CheckboxColumn("✓ Verified"),
+                "flagged": st.column_config.CheckboxColumn("🚩 Flagged")
+            }
+            if "file_url" in df_browse.columns:
+                column_config["file_url"] = st.column_config.LinkColumn("View Certificate", display_text="Open Link")
+                
+            st.dataframe(df_browse, column_config=column_config, use_container_width=True, hide_index=True)
             
-            st.write("##### Moderate Request")
-            req_ids = [r["id"] for r in st.session_state.requests if r["status"] == "Pending"]
-            if req_ids:
-                selected_id = st.selectbox("Select Request ID", req_ids)
-                col_btn1, col_btn2 = st.columns(2)
-                with col_btn1:
-                    if st.button("Approve Request", use_container_width=True):
-                        for r in st.session_state.requests:
-                            if r["id"] == selected_id:
-                                r["status"] = "Approved"
-                                log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Moderated request ID {selected_id}: Approved")
-                        st.success(f"Request {selected_id} approved!")
+            st.markdown("#### 📄 Row-Level Actions (First 10 matches):")
+            for idx, r in enumerate(filtered_records[:10]):
+                ref_id = r.get("reference_id", "N/A")
+                title = r.get("title", "Untitled")
+                name_val = r.get("faculty_name") or r.get("student_name") or r.get("author") or r.get("speaker") or "Unknown"
+                file_url = r.get("file_url")
+                is_verified = r.get("verified", False)
+                is_flagged = r.get("flagged", False)
+                
+                status_icons = ""
+                if is_verified:
+                    status_icons += " <span style='color: #4ade80; font-weight: bold; margin-left: 5px;'>✓ Verified</span>"
+                if is_flagged:
+                    status_icons += " <span style='color: #fbbf24; font-weight: bold; margin-left: 5px;'>🚩 Flagged</span>"
+                    
+                col_info, col_verify, col_flag, col_view, col_dl = st.columns([3.5, 1.2, 1.2, 1.2, 1.2])
+                with col_info:
+                    st.markdown(f"**{ref_id}** | {title} (by *{name_val}*){status_icons}", unsafe_allow_html=True)
+                with col_verify:
+                    verified_val = st.toggle("Verify", value=is_verified, key=f"v_tgl_{selected_col}_{ref_id}")
+                    if verified_val != is_verified:
+                        db.update_record(selected_col, r["doc_id"], {"verified": verified_val})
+                        log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Toggled verification for {ref_id} to {verified_val}")
                         st.rerun()
-                with col_btn2:
-                    if st.button("Reject Request", use_container_width=True):
-                        for r in st.session_state.requests:
-                            if r["id"] == selected_id:
-                                r["status"] = "Rejected"
-                                log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Moderated request ID {selected_id}: Rejected")
-                        st.warning(f"Request {selected_id} rejected.")
+                with col_flag:
+                    flag_label = "Unflag 🏳️" if is_flagged else "Flag 🚩"
+                    if st.button(flag_label, key=f"f_btn_{selected_col}_{ref_id}", use_container_width=True):
+                        db.update_record(selected_col, r["doc_id"], {"flagged": not is_flagged})
+                        log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Toggled flag status for {ref_id} to {not is_flagged}")
                         st.rerun()
+                with col_view:
+                    if file_url:
+                        st.link_button("👁️ View", file_url, key=f"view_cert_{selected_col}_{idx}", use_container_width=True)
+                    else:
+                        st.button("No Proof", key=f"no_cert_view_{selected_col}_{idx}", disabled=True, use_container_width=True)
+                with col_dl:
+                    if file_url:
+                        st.link_button("📥 Download", file_url, key=f"dl_cert_{selected_col}_{idx}", use_container_width=True)
+                    else:
+                        st.button("N/A", key=f"no_cert_dl_{selected_col}_{idx}", disabled=True, use_container_width=True)
+                        
+            st.markdown("---")
+            col_export_bytes = export_to_excel(filtered_records)
+            st.download_button(
+                label=f"📥 Export Entire {collections_map[selected_col]} Collection to Excel",
+                data=col_export_bytes,
+                file_name=f"aiml_dept_{selected_col}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="dl_entire_collection_btn",
+                use_container_width=True,
+                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, f"Exported entire {selected_col} collection to Excel")
+            )
+
+    with st.expander("📢 Student Requests & Announcement Management", expanded=False):
+        col_left, col_right = st.columns([2, 1])
+        
+        with col_left:
+            st.markdown("#### 📋 Student Requests Management")
+            if not st.session_state.requests:
+                st.info("No requests pending.")
             else:
-                st.success("All current requests have been moderated!")
+                df_requests = pd.DataFrame(st.session_state.requests)
+                st.dataframe(df_requests, use_container_width=True)
+                
+                st.write("##### Moderate Request")
+                req_ids = [r["id"] for r in st.session_state.requests if r["status"] == "Pending"]
+                if req_ids:
+                    selected_id = st.selectbox("Select Request ID", req_ids)
+                    col_btn1, col_btn2 = st.columns(2)
+                    with col_btn1:
+                        if st.button("Approve Request", use_container_width=True):
+                            for r in st.session_state.requests:
+                                if r["id"] == selected_id:
+                                    r["status"] = "Approved"
+                                    log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Moderated request ID {selected_id}: Approved")
+                            st.success(f"Request {selected_id} approved!")
+                            st.rerun()
+                    with col_btn2:
+                        if st.button("Reject Request", use_container_width=True):
+                            for r in st.session_state.requests:
+                                if r["id"] == selected_id:
+                                    r["status"] = "Rejected"
+                                    log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Moderated request ID {selected_id}: Rejected")
+                            st.warning(f"Request {selected_id} rejected.")
+                            st.rerun()
+                else:
+                    st.success("All current requests have been moderated!")
 
-    with col_right:
-        st.markdown("#### 📢 Post Announcement")
-        new_title = st.text_input("Announcement Title")
-        new_content = st.text_area("Announcement Description")
-        if st.button("Post Announcement", use_container_width=True):
-            if new_title and new_content:
-                st.session_state.announcements.insert(0, {
-                    "id": len(st.session_state.announcements) + 1,
-                    "title": sanitize_text(new_title),
-                    "content": sanitize_text(new_content),
-                    "posted_by": st.session_state.username,
-                    "date": datetime.now().strftime("%Y-%m-%d")
-                })
-                log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Posted announcement: {new_title}")
-                st.success("Announcement posted successfully!")
-                st.rerun()
-            else:
-                st.warning("Please enter both title and content.")
+        with col_right:
+            st.markdown("#### 📢 Post Announcement")
+            new_title = st.text_input("Announcement Title")
+            new_content = st.text_area("Announcement Description")
+            if st.button("Post Announcement", use_container_width=True):
+                if new_title and new_content:
+                    st.session_state.announcements.insert(0, {
+                        "id": len(st.session_state.announcements) + 1,
+                        "title": sanitize_text(new_title),
+                        "content": sanitize_text(new_content),
+                        "posted_by": st.session_state.username,
+                        "date": datetime.now().strftime("%Y-%m-%d")
+                    })
+                    log_event("DATA_SUBMITTED", st.session_state.username, st.session_state.role, f"Posted announcement: {new_title}")
+                    st.success("Announcement posted successfully!")
+                    st.rerun()
+                else:
+                    st.warning("Please enter both title and content.")
 
-        # Show registered accounts
-        st.markdown("#### 👤 Registered User Registry")
-        user_list = [
-            {"Username": "hod_aiml", "Name": "Head of Department", "Role": "HoD"},
-            {"Username": "fac_turing", "Name": "Alan Turing", "Role": "Faculty"},
-            {"Username": "stu_hopper", "Name": "Grace Hopper", "Role": "Student"}
-        ]
-        st.table(pd.DataFrame(user_list))
-
+            # Show registered accounts
+            st.markdown("#### 👤 Registered User Registry")
+            user_list = [
+                {"Username": "hod_aiml", "Name": "Head of Department", "Role": "HoD"},
+                {"Username": "fac_turing", "Name": "Alan Turing", "Role": "Faculty"},
+                {"Username": "stu_hopper", "Name": "Grace Hopper", "Role": "Student"}
+            ]
+            st.table(pd.DataFrame(user_list))
 
 def get_latest_submission_ref_id(collection: str, id_field: str, id_val: str) -> str:
     import utils.db as db
@@ -1075,28 +1146,40 @@ def render_faculty_dashboard():
     with tab_fdp:
         st.markdown("### 📚 Faculty Development Program (FDP) Submission")
         
-        # Standard input fields
-        faculty_name = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="fdp_fac_name")
-        employee_id = st.text_input("Employee ID*", key="fdp_emp_id")
-        fdp_title = st.text_input("FDP Title*", key="fdp_title", on_change=check_title_duplicate, args=("faculty_fdp", "fdp_title"))
+        # Standard input fields grouped in columns
+        col_f1, col_f2 = st.columns(2)
+        with col_f1:
+            faculty_name = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="fdp_fac_name")
+        with col_f2:
+            employee_id = st.text_input("Employee ID*", key="fdp_emp_id")
+            
+        col_f3, col_f4 = st.columns(2)
+        with col_f3:
+            fdp_title = st.text_input("FDP Title*", key="fdp_title", on_change=check_title_duplicate, args=("faculty_fdp", "fdp_title"))
+        with col_f4:
+            organizing_institution = st.text_input("Organizing Institution*", key="fdp_org")
+            
         if st.session_state.get("fdp_title_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['fdp_title_dup_ref']}). You can still submit if this is a different entry.")
-        organizing_institution = st.text_input("Organizing Institution*", key="fdp_org")
-        
-        col_date1, col_date2 = st.columns(2)
+            
+        col_date1, col_date2, col_dur = st.columns(3)
         with col_date1:
             start_date = st.date_input("Start Date*", key="fdp_start_date")
         with col_date2:
             end_date = st.date_input("End Date*", key="fdp_end_date")
+        with col_dur:
+            duration_days = (end_date - start_date).days + 1 if end_date >= start_date else 0
+            st.number_input("Duration (Days)", value=duration_days, disabled=True, key="fdp_dur")
             
-        # Duration calculation
-        duration_days = (end_date - start_date).days + 1 if end_date >= start_date else 0
-        st.number_input("Duration in Days (Auto-calculated)", value=duration_days, disabled=True, key="fdp_dur")
-        
-        mode = st.selectbox("Mode*", ["Online", "Offline", "Hybrid"], key="fdp_mode")
+        col_m, col_l, col_fun = st.columns(3)
+        with col_m:
+            mode = st.selectbox("Mode*", ["Online", "Offline", "Hybrid"], key="fdp_mode")
+        with col_l:
+            level = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="fdp_level")
+        with col_fun:
+            funding = st.selectbox("Funding", ["Self-funded", "AICTE", "Institution", "Industry"], key="fdp_funding")
+            
         topic_domain = st.text_input("Topic/Domain*", key="fdp_topic")
-        level = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="fdp_level")
-        funding = st.selectbox("Funding", ["Self-funded", "AICTE", "Institution", "Industry"], key="fdp_funding")
         brief_description = st.text_area("Brief Description (optional, max 300 chars)", max_chars=300, key="fdp_desc")
         
         # File Upload section with a dotted border box
@@ -1152,23 +1235,23 @@ def render_faculty_dashboard():
                     file_name = ""
                     if uploaded_file is not None:
                         with st.spinner("Uploading file securely..."):
-                            try:
-                                from utils.db import generate_reference_id
-                                temp_ref = generate_reference_id("faculty_fdp")
-                                upload_res = secure_upload(uploaded_file, temp_ref, "faculty_fdp")
-                                if not upload_res["success"]:
-                                    log_event("FILE_UPLOAD_FAILED", st.session_state.username, st.session_state.role, f"Failed to upload FDP certificate: {uploaded_file.name}. Error: {upload_res['error']}")
-                                    st.error(f"File upload failed: {upload_res['error']}")
-                                    st.stop()
-                                
-                                file_url = upload_res["url"]
-                                file_name = upload_res["safe_filename"]
-                                log_event("FILE_UPLOADED", st.session_state.username, st.session_state.role, f"Uploaded FDP certificate: {file_name}")
-                            except Exception as upload_err:
-                                log_event("FILE_UPLOAD_FAILED", st.session_state.username, st.session_state.role, f"Failed to upload FDP certificate: {uploaded_file.name}. Error: {upload_err}")
-                                st.error(f"File upload failed: {upload_err}")
-                                st.stop()
-                            
+                             try:
+                                 from utils.db import generate_reference_id
+                                 temp_ref = generate_reference_id("faculty_fdp")
+                                 upload_res = secure_upload(uploaded_file, temp_ref, "faculty_fdp")
+                                 if not upload_res["success"]:
+                                     log_event("FILE_UPLOAD_FAILED", st.session_state.username, st.session_state.role, f"Failed to upload FDP certificate: {uploaded_file.name}. Error: {upload_res['error']}")
+                                     st.error(f"File upload failed: {upload_res['error']}")
+                                     st.stop()
+                                 
+                                 file_url = upload_res["url"]
+                                 file_name = upload_res["safe_filename"]
+                                 log_event("FILE_UPLOADED", st.session_state.username, st.session_state.role, f"Uploaded FDP certificate: {file_name}")
+                             except Exception as upload_err:
+                                 log_event("FILE_UPLOAD_FAILED", st.session_state.username, st.session_state.role, f"Failed to upload FDP certificate: {uploaded_file.name}. Error: {upload_err}")
+                                 st.error(f"File upload failed: {upload_err}")
+                                 st.stop()
+                             
                     data = {
                         "title": s_title["clean"],
                         "organizer": s_org["clean"],
@@ -1208,20 +1291,46 @@ def render_faculty_dashboard():
     with tab_pub:
         st.markdown("### 📄 Research Publication Submission")
         
-        faculty_name_pub = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="pub_fac_name")
-        employee_id_pub = st.text_input("Employee ID*", key="pub_emp_id")
-        paper_title = st.text_input("Paper Title*", key="pub_title", on_change=check_title_duplicate, args=("faculty_publications", "pub_title"))
+        # Standard input fields grouped in columns
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            faculty_name_pub = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="pub_fac_name")
+        with col_p2:
+            employee_id_pub = st.text_input("Employee ID*", key="pub_emp_id")
+            
+        col_p3, col_p4 = st.columns(2)
+        with col_p3:
+            paper_title = st.text_input("Paper Title*", key="pub_title", on_change=check_title_duplicate, args=("faculty_publications", "pub_title"))
+        with col_p4:
+            journal_name = st.text_input("Journal/Conference Name*", key="pub_journal")
+            
         if st.session_state.get("pub_title_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['pub_title_dup_ref']}). You can still submit if this is a different entry.")
-        journal_name = st.text_input("Journal/Conference Name*", key="pub_journal")
-        publication_type = st.selectbox("Publication Type*", ["Journal", "Conference", "Book Chapter", "Patent"], key="pub_type")
-        publisher = st.text_input("Publisher*", key="pub_publisher")
-        issn_isbn = st.text_input("ISSN/ISBN", key="pub_issn")
-        doi_link = st.text_input("DOI Link", key="pub_doi")
-        publication_date = st.date_input("Publication Date*", key="pub_date")
-        impact_factor = st.number_input("Impact Factor", min_value=0.0, max_value=50.0, step=0.1, key="pub_impact")
-        indexed_in = st.multiselect("Indexed In*", ["SCI", "Scopus", "UGC Care", "Web of Science", "DBLP", "Other"], key="pub_indexed")
-        co_authors = st.text_input("Co-Authors (comma-separated)", key="pub_authors")
+            
+        col_p5, col_p6 = st.columns(2)
+        with col_p5:
+            publication_type = st.selectbox("Publication Type*", ["Journal", "Conference", "Book Chapter", "Patent"], key="pub_type")
+        with col_p6:
+            publisher = st.text_input("Publisher*", key="pub_publisher")
+            
+        col_p7, col_p8 = st.columns(2)
+        with col_p7:
+            publication_date = st.date_input("Publication Date*", key="pub_date")
+        with col_p8:
+            issn_isbn = st.text_input("ISSN/ISBN", key="pub_issn")
+            
+        col_p9, col_p10 = st.columns(2)
+        with col_p9:
+            doi_link = st.text_input("DOI Link", key="pub_doi")
+        with col_p10:
+            impact_factor = st.number_input("Impact Factor", min_value=0.0, max_value=50.0, step=0.1, key="pub_impact")
+            
+        col_p11, col_p12 = st.columns(2)
+        with col_p11:
+            indexed_in = st.multiselect("Indexed In*", ["SCI", "Scopus", "UGC Care", "Web of Science", "DBLP", "Other"], key="pub_indexed")
+        with col_p12:
+            co_authors = st.text_input("Co-Authors (comma-separated)", key="pub_authors")
+            
         abstract = st.text_area("Abstract (optional, max 500 chars)", max_chars=500, key="pub_abstract")
         
         # File Upload section with dotted border box
@@ -1334,19 +1443,39 @@ def render_faculty_dashboard():
     with tab_wks:
         st.markdown("### 🛠️ Workshops / Seminars Submission")
         
-        faculty_name_wks = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="wks_fac_name")
-        employee_id_wks = st.text_input("Employee ID*", key="wks_emp_id")
-        workshop_name = st.text_input("Workshop/Conference Name*", key="wks_name", on_change=check_title_duplicate, args=("faculty_workshops", "wks_name"))
+        # Standard input fields grouped in columns
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
+            faculty_name_wks = st.text_input("Faculty Name*", value=st.session_state.user_display_name, key="wks_fac_name")
+        with col_w2:
+            employee_id_wks = st.text_input("Employee ID*", key="wks_emp_id")
+            
+        col_w3, col_w4 = st.columns(2)
+        with col_w3:
+            workshop_name = st.text_input("Workshop/Conference Name*", key="wks_name", on_change=check_title_duplicate, args=("faculty_workshops", "wks_name"))
+        with col_w4:
+            organizer = st.text_input("Organizer*", key="wks_org")
+            
         if st.session_state.get("wks_name_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['wks_name_dup_ref']}). You can still submit if this is a different entry.")
-        organizer = st.text_input("Organizer*", key="wks_org")
-        workshop_date = st.date_input("Date*", key="wks_date")
-        duration = st.text_input("Duration*", key="wks_dur")
-        mode_wks = st.selectbox("Mode*", ["Online", "Offline", "Hybrid"], key="wks_mode")
-        role_wks = st.selectbox("Role*", ["Attended", "Resource Person", "Organizer", "Keynote Speaker"], key="wks_role")
+            
+        col_w5, col_w6, col_w7 = st.columns(3)
+        with col_w5:
+            workshop_date = st.date_input("Date*", key="wks_date")
+        with col_w6:
+            duration = st.text_input("Duration*", key="wks_dur")
+        with col_w7:
+            certificate_number = st.text_input("Certificate Number (optional)", key="wks_cert_num")
+            
+        col_w8, col_w9, col_w10 = st.columns(3)
+        with col_w8:
+            mode_wks = st.selectbox("Mode*", ["Online", "Offline", "Hybrid"], key="wks_mode")
+        with col_w9:
+            role_wks = st.selectbox("Role*", ["Attended", "Resource Person", "Organizer", "Keynote Speaker"], key="wks_role")
+        with col_w10:
+            level_wks = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="wks_level")
+            
         topic = st.text_input("Topic*", key="wks_topic")
-        level_wks = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="wks_level")
-        certificate_number = st.text_input("Certificate Number (optional)", key="wks_cert_num")
         
         # File Upload section with dotted border box
         st.markdown("""
@@ -1479,26 +1608,59 @@ def render_student_dashboard():
     with tab_hack:
         st.markdown("### 🏆 Hackathon Submission Portal")
         
-        student_name = st.text_input("Student Name*", value=st.session_state.user_display_name, key="hack_stud_name")
-        register_number = st.text_input("Register Number*", key="hack_reg_num")
-        semester = st.selectbox("Semester*", list(range(1, 9)), key="hack_sem")
-        section = st.text_input("Section*", key="hack_sec")
-        hackathon_name = st.text_input("Hackathon Name*", key="hack_name", on_change=check_title_duplicate, args=("student_hackathons", "hack_name"))
+        col_h1, col_h2 = st.columns(2)
+        with col_h1:
+            student_name = st.text_input("Student Name*", value=st.session_state.user_display_name, key="hack_stud_name")
+        with col_h2:
+            register_number = st.text_input("Register Number*", key="hack_reg_num")
+            
+        col_h3, col_h4 = st.columns(2)
+        with col_h3:
+            semester = st.selectbox("Semester*", list(range(1, 9)), key="hack_sem")
+        with col_h4:
+            section = st.text_input("Section*", key="hack_sec")
+            
+        col_h5, col_h6 = st.columns(2)
+        with col_h5:
+            hackathon_name = st.text_input("Hackathon Name*", key="hack_name", on_change=check_title_duplicate, args=("student_hackathons", "hack_name"))
+        with col_h6:
+            team_name = st.text_input("Team Name*", key="hack_team_name")
+            
         if st.session_state.get("hack_name_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['hack_name_dup_ref']}). You can still submit if this is a different entry.")
-        organizer = st.text_input("Organizer*", key="hack_org")
-        platform = st.text_input("Platform (e.g. Devfolio, HackerEarth, direct)", key="hack_platform")
-        team_name = st.text_input("Team Name*", key="hack_team_name")
-        team_size = st.number_input("Team Size*", min_value=1, max_value=5, value=1, key="hack_team_size")
-        hack_date = st.date_input("Date*", key="hack_date")
-        duration = st.text_input("Duration* (e.g. 24 Hours, 48 Hours, 7 Days)", key="hack_duration")
-        level = st.selectbox("Level*", ["Institution", "State", "National", "International", "Global"], key="hack_level")
-        result = st.selectbox("Result*", ["Winner", "Runner-up", "Top 5", "Top 10", "Finalist", "Participant"], key="hack_result")
-        prize_amount = st.number_input("Prize Amount (number in ₹, optional)", min_value=0, value=0, key="hack_prize")
-        project_title = st.text_input("Project Title*", key="hack_proj_title")
-        project_description = st.text_area("Project Description (optional, max 400 chars)", max_chars=400, key="hack_proj_desc")
-        github_link = st.text_input("GitHub/Demo Link (optional)", key="hack_git_link")
+            
+        col_h7, col_h8 = st.columns(2)
+        with col_h7:
+            organizer = st.text_input("Organizer*", key="hack_org")
+        with col_h8:
+            platform = st.text_input("Platform (e.g. Devfolio, HackerEarth, direct)", key="hack_platform")
+            
+        col_h9, col_h10 = st.columns(2)
+        with col_h9:
+            team_size = st.number_input("Team Size*", min_value=1, max_value=5, value=1, key="hack_team_size")
+        with col_h10:
+            level = st.selectbox("Level*", ["Institution", "State", "National", "International", "Global"], key="hack_level")
+            
+        col_h11, col_h12 = st.columns(2)
+        with col_h11:
+            hack_date = st.date_input("Date*", key="hack_date")
+        with col_h12:
+            duration = st.text_input("Duration* (e.g. 24 Hours, 48 Hours, 7 Days)", key="hack_duration")
+            
+        col_h13, col_h14 = st.columns(2)
+        with col_h13:
+            result = st.selectbox("Result*", ["Winner", "Runner-up", "Top 5", "Top 10", "Finalist", "Participant"], key="hack_result")
+        with col_h14:
+            prize_amount = st.number_input("Prize Amount (number in ₹, optional)", min_value=0, value=0, key="hack_prize")
+            
+        col_h15, col_h16 = st.columns(2)
+        with col_h15:
+            project_title = st.text_input("Project Title*", key="hack_proj_title")
+        with col_h16:
+            github_link = st.text_input("GitHub/Demo Link (optional)", key="hack_git_link")
+            
         team_members = st.text_input("Team Members (comma-separated names, optional)", key="hack_teammates")
+        project_description = st.text_area("Project Description (optional, max 400 chars)", max_chars=400, key="hack_proj_desc")
         
         # Winner / Runner-up note
         if result in ["Winner", "Runner-up"]:
@@ -1625,20 +1787,45 @@ def render_student_dashboard():
     with tab_comp:
         st.markdown("### 🏆 Competitions Submission Portal")
         
-        student_name_comp = st.text_input("Student Name*", value=st.session_state.user_display_name, key="comp_stud_name")
-        register_number_comp = st.text_input("Register Number*", key="comp_reg_num")
-        semester_comp = st.selectbox("Semester*", list(range(1, 9)), key="comp_sem")
-        section_comp = st.text_input("Section*", key="comp_sec")
-        competition_name = st.text_input("Competition Name*", key="comp_name", on_change=check_title_duplicate, args=("student_competitions", "comp_name"))
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
+            student_name_comp = st.text_input("Student Name*", value=st.session_state.user_display_name, key="comp_stud_name")
+        with col_c2:
+            register_number_comp = st.text_input("Register Number*", key="comp_reg_num")
+            
+        col_c3, col_c4 = st.columns(2)
+        with col_c3:
+            semester_comp = st.selectbox("Semester*", list(range(1, 9)), key="comp_sem")
+        with col_c4:
+            section_comp = st.text_input("Section*", key="comp_sec")
+            
+        col_c5, col_c6 = st.columns(2)
+        with col_c5:
+            competition_name = st.text_input("Competition Name*", key="comp_name", on_change=check_title_duplicate, args=("student_competitions", "comp_name"))
+        with col_c6:
+            organizer_comp = st.text_input("Organizer*", key="comp_org")
+            
         if st.session_state.get("comp_name_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['comp_name_dup_ref']}). You can still submit if this is a different entry.")
-        category = st.multiselect("Category*", ["Technical", "Coding", "Design", "Business", "Cultural", "Sports", "Quiz", "Other"], key="comp_cat")
-        organizer_comp = st.text_input("Organizer*", key="comp_org")
-        venue = st.text_input("Venue (optional)", key="comp_venue")
-        comp_date = st.date_input("Date*", key="comp_date")
-        level_comp = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="comp_level")
-        result_comp = st.selectbox("Result*", ["Winner", "Runner-up", "Top 3", "Top 10", "Participant"], key="comp_result")
-        prize_amount_comp = st.number_input("Prize Amount (number in ₹, optional)", min_value=0, value=0, key="comp_prize")
+            
+        col_c7, col_c8 = st.columns(2)
+        with col_c7:
+            category = st.multiselect("Category*", ["Technical", "Coding", "Design", "Business", "Cultural", "Sports", "Quiz", "Other"], key="comp_cat")
+        with col_c8:
+            venue = st.text_input("Venue (optional)", key="comp_venue")
+            
+        col_c9, col_c10 = st.columns(2)
+        with col_c9:
+            comp_date = st.date_input("Date*", key="comp_date")
+        with col_c10:
+            level_comp = st.selectbox("Level*", ["Institution", "State", "National", "International"], key="comp_level")
+            
+        col_c11, col_c12 = st.columns(2)
+        with col_c11:
+            result_comp = st.selectbox("Result*", ["Winner", "Runner-up", "Top 3", "Top 10", "Participant"], key="comp_result")
+        with col_c12:
+            prize_amount_comp = st.number_input("Prize Amount (number in ₹, optional)", min_value=0, value=0, key="comp_prize")
+            
         description_comp = st.text_area("Description (optional)", key="comp_desc")
         
         # File Upload section with dotted border box
@@ -1750,23 +1937,39 @@ def render_student_dashboard():
     with tab_cert:
         st.markdown("### 🎓 Course Certification Submission Portal")
         
-        student_name_cert = st.text_input("Student Name*", value=st.session_state.user_display_name, key="cert_stud_name")
-        register_number_cert = st.text_input("Register Number*", key="cert_reg_num")
-        semester_cert = st.selectbox("Semester*", list(range(1, 9)), key="cert_sem")
-        certification_name = st.text_input("Certification Name*", key="cert_name", on_change=check_title_duplicate, args=("student_certifications", "cert_name"))
+        col_ce1, col_ce2 = st.columns(2)
+        with col_ce1:
+            student_name_cert = st.text_input("Student Name*", value=st.session_state.user_display_name, key="cert_stud_name")
+        with col_ce2:
+            register_number_cert = st.text_input("Register Number*", key="cert_reg_num")
+            
+        col_ce3, col_ce4 = st.columns(2)
+        with col_ce3:
+            semester_cert = st.selectbox("Semester*", list(range(1, 9)), key="cert_sem")
+        with col_ce4:
+            certification_name = st.text_input("Certification Name*", key="cert_name", on_change=check_title_duplicate, args=("student_certifications", "cert_name"))
+            
         if st.session_state.get("cert_name_dup_ref"):
             st.warning(f"⚠️ Warning: A record with this title already exists (Ref ID: {st.session_state['cert_name_dup_ref']}). You can still submit if this is a different entry.")
-        issuing_platform = st.selectbox("Issuing Platform*", ["Coursera", "NPTEL", "Udemy", "Google", "Microsoft", "AWS", "IBM", "Oracle", "Cisco", "edX", "LinkedIn Learning", "Other"], key="cert_platform")
-        course_duration = st.number_input("Course Duration* (in hours)", min_value=1, value=10, key="cert_dur")
-        
-        col_cdate1, col_cdate2 = st.columns(2)
-        with col_cdate1:
+            
+        col_ce5, col_ce6 = st.columns(2)
+        with col_ce5:
+            issuing_platform = st.selectbox("Issuing Platform*", ["Coursera", "NPTEL", "Udemy", "Google", "Microsoft", "AWS", "IBM", "Oracle", "Cisco", "edX", "LinkedIn Learning", "Other"], key="cert_platform")
+        with col_ce6:
+            course_duration = st.number_input("Course Duration* (in hours)", min_value=1, value=10, key="cert_dur")
+            
+        col_ce7, col_ce8 = st.columns(2)
+        with col_ce7:
             start_date_cert = st.date_input("Start Date (optional)", value=None, key="cert_start_date")
-        with col_cdate2:
+        with col_ce8:
             completion_date = st.date_input("Completion Date*", key="cert_comp_date")
             
-        certificate_id = st.text_input("Certificate ID (optional — for verification)", key="cert_id")
-        grade_score = st.text_input("Grade/Score (optional: e.g. 95%, With Distinction, Pass)", key="cert_grade")
+        col_ce9, col_ce10 = st.columns(2)
+        with col_ce9:
+            certificate_id = st.text_input("Certificate ID (optional — for verification)", key="cert_id")
+        with col_ce10:
+            grade_score = st.text_input("Grade/Score (optional: e.g. 95%, With Distinction, Pass)", key="cert_grade")
+            
         skills_covered = st.text_input("Skills Covered* (comma-separated: e.g. Python, ML, Deep Learning)", key="cert_skills")
         verified = st.checkbox("I confirm this is my original certificate", key="cert_verified")
         
