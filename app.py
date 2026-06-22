@@ -65,6 +65,23 @@ st.markdown("""
         font-family: 'Outfit', sans-serif;
     }
     
+    /* Main App Background & Text Override */
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        background-color: #0b0d19 !important;
+        color: #f1f5f9 !important;
+    }
+    
+    /* Ensure all text labels and headings have bright colors for high visibility */
+    h1, h2, h3, h4, h5, h6, p, span, li {
+        color: #f1f5f9 !important;
+    }
+    
+    label, [data-testid="stWidgetLabel"] p, .stWidgetLabel {
+        color: #f1f5f9 !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+    }
+
     /* Title and header styles */
     .main-title {
         font-size: 3rem;
@@ -78,7 +95,7 @@ st.markdown("""
     
     .subtitle {
         font-size: 1.3rem;
-        color: #94a3b8;
+        color: #cbd5e1 !important;
         font-weight: 400;
         margin-top: 0px;
         margin-bottom: 2rem;
@@ -86,12 +103,12 @@ st.markdown("""
     
     /* Card design */
     .glass-card {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
@@ -99,13 +116,13 @@ st.markdown("""
     .stat-number {
         font-size: 2.2rem;
         font-weight: 800;
-        color: #38bdf8;
+        color: #38bdf8 !important;
         margin: 5px 0px;
     }
     
     .stat-label {
         font-size: 0.9rem;
-        color: #94a3b8;
+        color: #cbd5e1 !important;
         text-transform: uppercase;
         letter-spacing: 0.1rem;
     }
@@ -120,33 +137,33 @@ st.markdown("""
     }
     
     .badge-primary {
-        background: rgba(56, 189, 248, 0.15);
-        color: #38bdf8;
-        border: 1px solid rgba(56, 189, 248, 0.3);
+        background: rgba(56, 189, 248, 0.15) !important;
+        color: #38bdf8 !important;
+        border: 1px solid rgba(56, 189, 248, 0.3) !important;
     }
     
     .badge-secondary {
-        background: rgba(168, 85, 247, 0.15);
-        color: #a855f7;
-        border: 1px solid rgba(168, 85, 247, 0.3);
+        background: rgba(168, 85, 247, 0.15) !important;
+        color: #a855f7 !important;
+        border: 1px solid rgba(168, 85, 247, 0.3) !important;
     }
 
     /* Streamlit Metrics Override */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px !important;
         padding: 20px 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     [data-testid="metric-container"]:hover {
-        background: rgba(255, 255, 255, 0.04) !important;
-        border-color: rgba(56, 189, 248, 0.4) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(56, 189, 248, 0.5) !important;
         transform: translateY(-4px) !important;
-        box-shadow: 0 12px 40px 0 rgba(56, 189, 248, 0.15) !important;
+        box-shadow: 0 12px 40px 0 rgba(56, 189, 248, 0.2) !important;
     }
     [data-testid="stMetricValue"] {
         font-size: 2.2rem !important;
@@ -158,7 +175,7 @@ st.markdown("""
     [data-testid="stMetricLabel"] {
         font-size: 0.85rem !important;
         font-weight: 600 !important;
-        color: #94a3b8 !important;
+        color: #cbd5e1 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.08rem !important;
     }
@@ -182,34 +199,58 @@ st.markdown("""
     button[kind="secondary"] {
         background: rgba(255, 255, 255, 0.03) !important;
         color: #f1f5f9 !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-radius: 12px !important;
         padding: 10px 24px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     button[kind="secondary"]:hover {
         background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        border: 1px solid rgba(56, 189, 248, 0.4) !important;
         color: #38bdf8 !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
     }
 
-    /* Form Fields Override */
+    /* Form Fields & Options styling with high-visibility white text */
     div[data-baseweb="input"], div[data-baseweb="select"], textarea {
-        background-color: rgba(255, 255, 255, 0.01) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 10px !important;
         transition: all 0.3s ease !important;
     }
     div[data-baseweb="input"]:focus-within, div[data-baseweb="select"]:focus-within, textarea:focus {
         border-color: #38bdf8 !important;
-        box-shadow: 0 0 0 1px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.25) !important;
+        box-shadow: 0 0 0 1px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.3) !important;
+    }
+    
+    /* Input/Textarea/Select text visibility */
+    div[data-baseweb="input"] input, textarea, div[data-baseweb="select"] * {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+    
+    /* Style the selectbox dropdown menus to avoid black/dark fonts on black background */
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"], [role="listbox"] ul {
+        background-color: #16192b !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
+    li[role="option"], div[role="option"], [data-baseweb="menu"] li {
+        background-color: #16192b !important;
+        color: #ffffff !important;
+        padding: 10px 16px !important;
+        transition: all 0.2s ease !important;
+    }
+    li[role="option"]:hover, div[role="option"]:hover,
+    li[role="option"][aria-selected="true"], div[role="option"][aria-selected="true"] {
+        background-color: #38bdf8 !important;
+        color: #0f172a !important;
     }
 
     /* Tab bar override */
     button[data-baseweb="tab"] {
-        color: #94a3b8 !important;
+        color: #cbd5e1 !important;
         font-weight: 600 !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
@@ -227,20 +268,20 @@ st.markdown("""
     /* Sidebar Background & Border */
     [data-testid="stSidebar"] {
         background-color: #0b0d19 !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
     }
     
     /* Expander Override */
     div[data-testid="stExpander"] {
-        background: rgba(255, 255, 255, 0.01) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
         margin-bottom: 1rem !important;
         transition: border-color 0.3s ease !important;
     }
     div[data-testid="stExpander"]:hover {
-        border-color: rgba(56, 189, 248, 0.2) !important;
+        border-color: rgba(56, 189, 248, 0.3) !important;
     }
     </style>
     """, unsafe_allow_html=True)
