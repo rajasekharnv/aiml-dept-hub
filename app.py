@@ -67,17 +67,17 @@ st.markdown("""
     
     /* Main App Background & Text Override */
     .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-        background-color: #0b0d19 !important;
-        color: #f1f5f9 !important;
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
     }
     
-    /* Ensure all text labels and headings have bright colors for high visibility */
+    /* Ensure all text labels and headings have dark slate colors for high readability */
     h1, h2, h3, h4, h5, h6, p, span, li {
-        color: #f1f5f9 !important;
+        color: #0f172a !important;
     }
     
     label, [data-testid="stWidgetLabel"] p, .stWidgetLabel {
-        color: #f1f5f9 !important;
+        color: #334155 !important;
         font-weight: 600 !important;
         font-size: 0.95rem !important;
     }
@@ -86,7 +86,7 @@ st.markdown("""
     .main-title {
         font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(90deg, #38bdf8 0%, #a855f7 100%);
+        background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0px;
@@ -95,7 +95,7 @@ st.markdown("""
     
     .subtitle {
         font-size: 1.3rem;
-        color: #cbd5e1 !important;
+        color: #64748b !important;
         font-weight: 400;
         margin-top: 0px;
         margin-bottom: 2rem;
@@ -103,12 +103,12 @@ st.markdown("""
     
     /* Card design */
     .glass-card {
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(255, 255, 255, 0.7) !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
         border-radius: 16px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
@@ -116,13 +116,13 @@ st.markdown("""
     .stat-number {
         font-size: 2.2rem;
         font-weight: 800;
-        color: #38bdf8 !important;
+        color: #4f46e5 !important;
         margin: 5px 0px;
     }
     
     .stat-label {
         font-size: 0.9rem;
-        color: #cbd5e1 !important;
+        color: #64748b !important;
         text-transform: uppercase;
         letter-spacing: 0.1rem;
     }
@@ -137,120 +137,120 @@ st.markdown("""
     }
     
     .badge-primary {
-        background: rgba(56, 189, 248, 0.15) !important;
-        color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        background: rgba(79, 70, 229, 0.08) !important;
+        color: #4f46e5 !important;
+        border: 1px solid rgba(79, 70, 229, 0.2) !important;
     }
     
     .badge-secondary {
-        background: rgba(168, 85, 247, 0.15) !important;
-        color: #a855f7 !important;
-        border: 1px solid rgba(168, 85, 247, 0.3) !important;
+        background: rgba(6, 182, 212, 0.08) !important;
+        color: #06b6d4 !important;
+        border: 1px solid rgba(6, 182, 212, 0.2) !important;
     }
 
     /* Streamlit Metrics Override */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
         border-radius: 16px !important;
         padding: 20px 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     [data-testid="metric-container"]:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-color: rgba(56, 189, 248, 0.5) !important;
+        background: #ffffff !important;
+        border-color: rgba(79, 70, 229, 0.4) !important;
         transform: translateY(-4px) !important;
-        box-shadow: 0 12px 40px 0 rgba(56, 189, 248, 0.2) !important;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.08) !important;
     }
     [data-testid="stMetricValue"] {
         font-size: 2.2rem !important;
         font-weight: 800 !important;
-        background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%) !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
     }
     [data-testid="stMetricLabel"] {
         font-size: 0.85rem !important;
         font-weight: 600 !important;
-        color: #cbd5e1 !important;
+        color: #475569 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.08rem !important;
     }
 
     /* Buttons Override */
     button[kind="primary"] {
-        background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%) !important;
-        color: #0f172a !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
         border: none !important;
         border-radius: 12px !important;
         padding: 10px 24px !important;
-        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2) !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     button[kind="primary"]:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4) !important;
         opacity: 0.95 !important;
     }
     button[kind="secondary"] {
-        background: rgba(255, 255, 255, 0.03) !important;
-        color: #f1f5f9 !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: #ffffff !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
         border-radius: 12px !important;
         padding: 10px 24px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     button[kind="secondary"]:hover {
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(56, 189, 248, 0.4) !important;
-        color: #38bdf8 !important;
+        background: #f8fafc !important;
+        border: 1px solid #4f46e5 !important;
+        color: #4f46e5 !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
     }
 
-    /* Form Fields & Options styling with high-visibility white text */
+    /* Form Fields & Options styling with high-visibility dark text */
     div[data-baseweb="input"], div[data-baseweb="select"], textarea {
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
         border-radius: 10px !important;
         transition: all 0.3s ease !important;
     }
     div[data-baseweb="input"]:focus-within, div[data-baseweb="select"]:focus-within, textarea:focus {
-        border-color: #38bdf8 !important;
-        box-shadow: 0 0 0 1px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.3) !important;
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 1px #4f46e5, 0 0 12px rgba(79, 70, 229, 0.15) !important;
     }
     
     /* Input/Textarea/Select text visibility */
     div[data-baseweb="input"] input, textarea, div[data-baseweb="select"] * {
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
     }
     
-    /* Style the selectbox dropdown menus to avoid black/dark fonts on black background */
+    /* Style the selectbox dropdown menus to be clean white popups */
     div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"], [role="listbox"] ul {
-        background-color: #16192b !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
     }
     li[role="option"], div[role="option"], [data-baseweb="menu"] li {
-        background-color: #16192b !important;
-        color: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
         padding: 10px 16px !important;
         transition: all 0.2s ease !important;
     }
     li[role="option"]:hover, div[role="option"]:hover,
     li[role="option"][aria-selected="true"], div[role="option"][aria-selected="true"] {
-        background-color: #38bdf8 !important;
-        color: #0f172a !important;
+        background-color: #f1f5f9 !important;
+        color: #4f46e5 !important;
     }
 
     /* Tab bar override */
     button[data-baseweb="tab"] {
-        color: #cbd5e1 !important;
+        color: #475569 !important;
         font-weight: 600 !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
@@ -258,30 +258,39 @@ st.markdown("""
         padding-bottom: 8px !important;
     }
     button[data-baseweb="tab"]:hover {
-        color: #38bdf8 !important;
+        color: #4f46e5 !important;
     }
     button[aria-selected="true"] {
-        color: #38bdf8 !important;
-        border-bottom: 2px solid #38bdf8 !important;
+        color: #4f46e5 !important;
+        border-bottom: 2px solid #4f46e5 !important;
     }
 
     /* Sidebar Background & Border */
     [data-testid="stSidebar"] {
-        background-color: #0b0d19 !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background-color: #f1f5f9 !important;
+        border-right: 1px solid #e2e8f0 !important;
     }
     
     /* Expander Override */
     div[data-testid="stExpander"] {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
         margin-bottom: 1rem !important;
         transition: border-color 0.3s ease !important;
     }
     div[data-testid="stExpander"]:hover {
-        border-color: rgba(56, 189, 248, 0.3) !important;
+        border-color: rgba(79, 70, 229, 0.3) !important;
+    }
+    
+    /* File upload dashed container overrides for light theme */
+    div[style*="dashed"] {
+        border: 2px dashed rgba(79, 70, 229, 0.3) !important;
+        background-color: rgba(79, 70, 229, 0.03) !important;
+    }
+    div[style*="dashed"] span {
+        color: #4f46e5 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -353,16 +362,16 @@ def render_hod_dashboard():
     
     # 1. Custom Premium Welcome Banner
     st.markdown(f"""
-        <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%); 
-                    border: 1px solid rgba(255, 255, 255, 0.05); 
+        <div style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(6, 182, 212, 0.06) 100%); 
+                    border: 1px solid rgba(79, 70, 229, 0.12); 
                     border-radius: 16px; padding: 24px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
             <div>
-                <h2 style="margin: 0px; font-weight: 800; color: #f1f5f9;">Welcome, {st.session_state.user_display_name} 👋</h2>
-                <p style="margin: 5px 0px 0px 0px; color: #94a3b8; font-size: 0.95rem;">
-                    Role: <span style="color: #f43f5e; font-weight: bold;">Head of Department (HoD)</span> | Department of AIML
+                <h2 style="margin: 0px; font-weight: 800; color: #0f172a;">Welcome, {st.session_state.user_display_name} 👋</h2>
+                <p style="margin: 5px 0px 0px 0px; color: #475569; font-size: 0.95rem;">
+                    Role: <span style="color: #4f46e5; font-weight: bold;">Head of Department (HoD)</span> | Department of AIML
                 </p>
             </div>
-            <div style="font-size: 2.5rem; filter: drop-shadow(0 4px 10px rgba(56,189,248,0.2));">📊</div>
+            <div style="font-size: 2.5rem; filter: drop-shadow(0 4px 10px rgba(79,70,229,0.15));">📊</div>
         </div>
     """, unsafe_allow_html=True)
     
