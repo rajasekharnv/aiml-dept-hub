@@ -209,6 +209,116 @@ async def _run_report_async(prompt: str, username: str) -> str:
     
     return response_text
 
+def generate_fallback_report(prompt: str) -> str:
+    from utils.db import get_all_records
+    from utils.db import (FACULTY_FDP, FACULTY_PUBLICATIONS, 
+        FACULTY_WORKSHOPS, STUDENT_HACKATHONS, 
+        STUDENT_COMPETITIONS, STUDENT_CERTIFICATIONS)
+    
+    p = prompt.lower()
+    
+    # Fetch counts
+    fdps = get_all_records(FACULTY_FDP)
+    publications = get_all_records(FACULTY_PUBLICATIONS)
+    workshops = get_all_records(FACULTY_WORKSHOPS)
+    hackathons = get_all_records(STUDENT_HACKATHONS)
+    competitions = get_all_records(STUDENT_COMPETITIONS)
+    certifications = get_all_records(STUDENT_CERTIFICATIONS)
+    
+    report = "## 📊 Department Performance Summary Report (Fallback Mode)\n\n"
+    report += "This report was generated using direct database queries due to temporary AI model quota limits.\n\n"
+    
+    # Check what type of report the user wanted
+    if "fdp" in p or "faculty development" in p:
+        report += f"### 📚 Faculty Development Programs (FDPs) - Total: {len(fdps)}\n"
+        if fdps:
+            for r in fdps[:10]:
+                report += f"- **{r.get('title', r.get('fdp_title', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')} (Date: {r.get('start_date', 'N/A')})\n"
+        else:
+            report += "_No FDP records found in the database._\n"
+            
+    elif "pub" in p or "research" in p or "paper" in p:
+        report += f"### 📄 Research Publications - Total: {len(publications)}\n"
+        if publications:
+            for r in publications[:10]:
+                report += f"- **{r.get('title', r.get('paper_title', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')} (Journal: {r.get('journal_name', 'N/A')}, Date: {r.get('publication_date', 'N/A')})\n"
+        else:
+            report += "_No publication records found in the database._\n"
+            
+    elif "workshop" in p or "seminar" in p:
+        report += f"### 🔧 Workshops & Seminars - Total: {len(workshops)}\n"
+        if workshops:
+            for r in workshops[:10]:
+                report += f"- **{r.get('title', r.get('workshop_name', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')} (Date: {r.get('date', 'N/A')})\n"
+        else:
+            report += "_No workshop records found in the database._\n"
+            
+    elif "hack" in p:
+        report += f"### 💻 Student Hackathons - Total: {len(hackathons)}\n"
+        if hackathons:
+            for r in hackathons[:10]:
+                report += f"- **{r.get('title', r.get('hackathon_name', 'Untitled'))}** by {r.get('student_name', 'Unknown')} (Result: {r.get('rank', 'Participant')}, Date: {r.get('date', 'N/A')})\n"
+        else:
+            report += "_No hackathon records found in the database._\n"
+            
+    elif "comp" in p or "contest" in p:
+        report += f"### 🏆 Student Competitions - Total: {len(competitions)}\n"
+        if competitions:
+            for r in competitions[:10]:
+                report += f"- **{r.get('title', r.get('event_name', 'Untitled'))}** by {r.get('student_name', 'Unknown')} (Result: {r.get('result', 'Participant')}, Date: {r.get('date', 'N/A')})\n"
+        else:
+            report += "_No competition records found in the database._\n"
+            
+    elif "cert" in p or "course" in p or "nptel" in p:
+        report += f"### 📜 Student Certifications - Total: {len(certifications)}\n"
+        if certifications:
+            for r in certifications[:10]:
+                report += f"- **{r.get('title', r.get('course_title', 'Untitled'))}** by {r.get('student_name', 'Unknown')} (Grade: {r.get('grade_score', 'N/A')}, Date: {r.get('date', 'N/A')})\n"
+        else:
+            report += "_No certification records found in the database._\n"
+            
+    else:
+        # General full summary report
+        report += "### 📈 Overview Metrics\n"
+        report += f"- **Faculty FDPs**: {len(fdps)} submissions\n"
+        report += f"- **Research Publications**: {len(publications)} submissions\n"
+        report += f"- **Workshops/Seminars**: {len(workshops)} submissions\n"
+        report += f"- **Student Hackathons**: {len(hackathons)} submissions\n"
+        report += f"- **Student Competitions**: {len(competitions)} submissions\n"
+        report += f"- **Student Certifications**: {len(certifications)} submissions\n\n"
+        
+        report += "### 👥 Recent Submissions\n"
+        combined = []
+        for r in fdps:
+            combined.append((r.get("created_at"), f"📚 [FDP] **{r.get('title', r.get('fdp_title', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')}"))
+        for r in publications:
+            combined.append((r.get("created_at"), f"📄 [Publication] **{r.get('title', r.get('paper_title', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')}"))
+        for r in workshops:
+            combined.append((r.get("created_at"), f"🔧 [Workshop] **{r.get('title', r.get('workshop_name', 'Untitled'))}** by {r.get('faculty_name', 'Unknown')}"))
+        for r in hackathons:
+            combined.append((r.get("created_at"), f"💻 [Hackathon] **{r.get('title', r.get('hackathon_name', 'Untitled'))}** by {r.get('student_name', 'Unknown')}"))
+        for r in competitions:
+            combined.append((r.get("created_at"), f"🏆 [Competition] **{r.get('title', r.get('event_name', 'Untitled'))}** by {r.get('student_name', 'Unknown')}"))
+        for r in certifications:
+            combined.append((r.get("created_at"), f"📜 [Certification] **{r.get('title', r.get('course_title', 'Untitled'))}** by {r.get('student_name', 'Unknown')}"))
+            
+        # Sort by creation time (descending)
+        def get_time(item):
+            t = item[0]
+            if t is None:
+                return 0.0
+            if hasattr(t, "timestamp"):
+                return t.timestamp()
+            return 0.0
+            
+        combined.sort(key=get_time, reverse=True)
+        for item in combined[:10]:
+            report += f"- {item[1]}\n"
+            
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    report += f"\n\nReport generated on {timestamp} | Data source: Firestore"
+    return report
+
 def run_report_agent(prompt: str, username: str) -> str:
     """
     Exposed function to run the ReportAgent synchronously.
@@ -241,7 +351,15 @@ def run_report_agent(prompt: str, username: str) -> str:
     st.session_state.report_queries_tracker[actual_username] = user_queries + 1
     
     # Call the actual agent
-    response = asyncio.run(_run_report_async(prompt, username))
+    try:
+        response = asyncio.run(_run_report_async(prompt, username))
+    except Exception as e:
+        print(f"Report Agent run failed: {e}")
+        response = "The report agent did not return a response."
+        
+    if "The report agent did not return a response." in response or not response.strip():
+        print("Fallback report generator triggered.")
+        response = generate_fallback_report(prompt)
     
     # 4. After agent responds: call validate_agent_output() to redact any sensitive data
     clean_response = validate_agent_output(response)

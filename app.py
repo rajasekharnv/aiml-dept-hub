@@ -1,5 +1,38 @@
 import streamlit as st
 import pandas as pd
+
+# Monkeypatch pandas to_excel to automatically strip timezones from all datetime columns and index
+_original_to_excel = pd.DataFrame.to_excel
+
+def _patched_to_excel(self, *args, **kwargs):
+    df_clean = self.copy()
+    if isinstance(df_clean.index, pd.DatetimeIndex) and df_clean.index.tz is not None:
+        df_clean.index = df_clean.index.tz_localize(None)
+        
+    for col in df_clean.columns:
+        if pd.api.types.is_datetime64_any_dtype(df_clean[col]):
+            if hasattr(df_clean[col].dt, "tz") and df_clean[col].dt.tz is not None:
+                try:
+                    df_clean[col] = df_clean[col].dt.tz_localize(None)
+                except Exception:
+                    try:
+                        df_clean[col] = df_clean[col].dt.tz_convert(None).dt.tz_localize(None)
+                    except Exception:
+                        pass
+        else:
+            def make_tz_unaware(val):
+                if hasattr(val, "tzinfo") and val.tzinfo is not None:
+                    try:
+                        return val.replace(tzinfo=None)
+                    except Exception:
+                        return str(val)
+                return val
+            df_clean[col] = df_clean[col].apply(make_tz_unaware)
+            
+    return _original_to_excel(df_clean, *args, **kwargs)
+
+pd.DataFrame.to_excel = _patched_to_excel
+
 from datetime import datetime
 import json
 import os
@@ -119,6 +152,31 @@ if "requests" not in st.session_state:
 intake_agent = IntakeAgent()
 report_agent = ReportAgent()
 
+def sanitize_df_for_excel(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ensures that all datetime columns are timezone-unaware before exporting to Excel.
+    """
+    df_clean = df.copy()
+    for col in df_clean.columns:
+        if pd.api.types.is_datetime64_any_dtype(df_clean[col]):
+            try:
+                df_clean[col] = df_clean[col].dt.tz_localize(None)
+            except TypeError:
+                try:
+                    df_clean[col] = df_clean[col].dt.tz_convert(None).dt.tz_localize(None)
+                except Exception:
+                    pass
+        else:
+            def make_tz_unaware(val):
+                if hasattr(val, "tzinfo") and val.tzinfo is not None:
+                    try:
+                        return val.replace(tzinfo=None)
+                    except Exception:
+                        return str(val)
+                return val
+            df_clean[col] = df_clean[col].apply(make_tz_unaware)
+    return df_clean
+
 # Helper to check for duplicate entry title in real-time
 def check_title_duplicate(collection: str, key_state: str):
     title_value = st.session_state.get(key_state, "").strip()
@@ -203,85 +261,92 @@ def render_hod_dashboard():
     # SECTION 1 — Live Metrics
     # ----------------------------------------------------
     import utils.db as db
+    from utils.db import get_all_records
+    from utils.db import (FACULTY_FDP, FACULTY_PUBLICATIONS, 
+        FACULTY_WORKSHOPS, STUDENT_HACKATHONS, 
+        STUDENT_COMPETITIONS, STUDENT_CERTIFICATIONS)
     from utils.audit import log_event
     from utils.export import export_to_pdf, export_to_excel, generate_pdf_report, generate_excel_report, export_my_records_excel
-    
-    fdp_count = db.get_count("faculty_fdp")
-    pub_count = db.get_count("faculty_publications")
-    wks_count = db.get_count("faculty_workshops")
-    hack_count = db.get_count("student_hackathons")
-    comp_count = db.get_count("student_competitions")
-    cert_count = db.get_count("student_certifications")
-    
-    st.markdown("### 📈 Live Department Metrics")
-    
-    row1_col1, row1_col2, row1_col3 = st.columns(3)
-    with row1_col1:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #38bdf8;'>
-                <div class='stat-number'>{fdp_count}</div>
-                <div class='stat-label'>Total FDPs Submitted</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All FDPs →", key="view_fdps_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "faculty_fdp"
-            st.rerun()
+
+    @st.cache_data(ttl=30)
+    def get_live_counts():
+        counts = {}
+        collections = {
+            "FDP": FACULTY_FDP,
+            "Publications": FACULTY_PUBLICATIONS, 
+            "Workshops": FACULTY_WORKSHOPS,
+            "Hackathons": STUDENT_HACKATHONS,
+            "Competitions": STUDENT_COMPETITIONS,
+            "Certifications": STUDENT_CERTIFICATIONS
+        }
+        for label, col in collections.items():
+            records = get_all_records(col)
+            counts[label] = len(records)
+            print(f"HoD Dashboard: {label} = {len(records)} records")
+        return counts
+
+    counts = get_live_counts()
+
+    # Preserve variables for down-stream visual charts and features
+    fdp_count = counts.get("FDP", 0)
+    pub_count = counts.get("Publications", 0)
+    wks_count = counts.get("Workshops", 0)
+    hack_count = counts.get("Hackathons", 0)
+    comp_count = counts.get("Competitions", 0)
+    cert_count = counts.get("Certifications", 0)
+
+    # Show metrics
+    col1, col2, col3 = st.columns(3)
+    col1.metric("📚 FDPs", fdp_count)
+    col2.metric("📄 Publications", pub_count)
+    col3.metric("🔧 Workshops", wks_count)
+
+    col4, col5, col6 = st.columns(3)
+    col4.metric("💻 Hackathons", hack_count)
+    col5.metric("🏆 Competitions", comp_count)
+    col6.metric("📜 Certifications", cert_count)
+
+    # Add refresh button
+    if st.button("🔄 Refresh Data", key="hod_refresh_data_btn"):
+        st.cache_data.clear()
+        st.rerun()
+
+    # Add raw data viewer for HoD
+    with st.expander("🔍 Browse All Records"):
+        selected = st.selectbox("Select Collection", 
+            ["FDP", "Publications", "Workshops", 
+             "Hackathons", "Competitions", "Certifications"])
+        
+        collection_map = {
+            "FDP": FACULTY_FDP,
+            "Publications": FACULTY_PUBLICATIONS,
+            "Workshops": FACULTY_WORKSHOPS,
+            "Hackathons": STUDENT_HACKATHONS,
+            "Competitions": STUDENT_COMPETITIONS,
+            "Certifications": STUDENT_CERTIFICATIONS
+        }
+        
+        records = get_all_records(collection_map[selected])
+        if records:
+            df = pd.DataFrame(records)
+            st.dataframe(df, use_container_width=True)
             
-    with row1_col2:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #a855f7;'>
-                <div class='stat-number'>{pub_count}</div>
-                <div class='stat-label'>Total Publications</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All Publications →", key="view_pubs_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "faculty_publications"
-            st.rerun()
+            # Download button
+            import io
+            excel_buffer = io.BytesIO()
+            df_clean = sanitize_df_for_excel(df)
+            df_clean.to_excel(excel_buffer, index=False)
+            excel_data = excel_buffer.getvalue()
             
-    with row1_col3:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #10b981;'>
-                <div class='stat-number'>{wks_count}</div>
-                <div class='stat-label'>Total Workshops</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All Workshops →", key="view_wks_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "faculty_workshops"
-            st.rerun()
-            
-    row2_col1, row2_col2, row2_col3 = st.columns(3)
-    with row2_col1:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #f59e0b;'>
-                <div class='stat-number'>{hack_count}</div>
-                <div class='stat-label'>Total Hackathon Entries</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All Hackathons →", key="view_hacks_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "student_hackathons"
-            st.rerun()
-            
-    with row2_col2:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #ec4899;'>
-                <div class='stat-number'>{comp_count}</div>
-                <div class='stat-label'>Total Competition Entries</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All Competitions →", key="view_comps_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "student_competitions"
-            st.rerun()
-            
-    with row2_col3:
-        st.markdown(f"""
-            <div class='glass-card' style='text-align: center; border-left: 4px solid #6366f1;'>
-                <div class='stat-number'>{cert_count}</div>
-                <div class='stat-label'>Total Certifications</div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("View All Certifications →", key="view_certs_metric_btn", use_container_width=True):
-            st.session_state["hod_selected_collection"] = "student_certifications"
-            st.rerun()
+            st.download_button(
+                "⬇️ Download as Excel",
+                data=excel_data,
+                file_name=f"{selected}_records.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key=f"dl_raw_hod_{selected}"
+            )
+        else:
+            st.info(f"No records found in {selected} collection")
 
     # ----------------------------------------------------
     # SECTION 2 — AI Report Generator
@@ -365,11 +430,13 @@ def render_hod_dashboard():
         
         act_col1, act_col2, act_col3 = st.columns(3)
         with act_col1:
+            # Detect whether generate_pdf_report returned real PDF or plain-text fallback
+            _is_pdf = isinstance(pdf_bytes, (bytes, bytearray)) and pdf_bytes[:4] == b"%PDF"
             st.download_button(
-                label="📥 Download as PDF",
+                label="📥 Download as PDF" if _is_pdf else "📥 Download Report (TXT)",
                 data=pdf_bytes,
-                file_name="aiml_department_report.pdf",
-                mime="application/pdf",
+                file_name="aiml_department_report.pdf" if _is_pdf else "aiml_department_report.txt",
+                mime="application/pdf" if _is_pdf else "text/plain",
                 key="dl_report_pdf_btn",
                 use_container_width=True,
                 on_click=lambda: log_event("RECORD_DOWNLOADED", st.session_state.username, st.session_state.role, "Downloaded AI report as PDF")
@@ -844,6 +911,151 @@ def check_last_submission_date():
         return True
     return False
 
+
+def show_my_submissions(username):
+    from utils.db import get_all_records
+    from utils.db import FACULTY_FDP, FACULTY_PUBLICATIONS, FACULTY_WORKSHOPS
+    
+    collections = {
+        "FDP": FACULTY_FDP,
+        "Publications": FACULTY_PUBLICATIONS,
+        "Workshops": FACULTY_WORKSHOPS
+    }
+    
+    found_any = False
+    clean_user = username.lower().replace("fac_", "").replace("stu_", "").replace("_", " ").strip()
+    display_name_clean = st.session_state.get("user_display_name", "").lower().replace("faculty", "").replace("student", "").strip()
+    
+    for label, collection in collections.items():
+        # Fetch ALL records and filter client-side
+        all_records = get_all_records(collection)
+        print(f"DEBUG: {collection} has {len(all_records)} total records")
+        
+        # Filter by any name-like field matching username
+        my_records = []
+        for r in all_records:
+            # Check multiple possible field names
+            name_fields = [
+                "faculty_name", "name", "employee_id", 
+                "submitted_by", "username", "user", "email"
+            ]
+            for field in name_fields:
+                val = str(r.get(field, "")).lower().strip()
+                if not val:
+                    continue
+                if (username.lower() in val or 
+                    val in username.lower() or
+                    st.session_state.get("username","").lower() in val or
+                    (clean_user and clean_user in val) or
+                    (display_name_clean and display_name_clean in val) or
+                    (val in display_name_clean)):
+                    my_records.append(r)
+                    break
+        
+        if my_records:
+            found_any = True
+            st.subheader(f"📋 My {label} Submissions ({len(my_records)})")
+            for record in my_records:
+                with st.container():
+                    col1, col2 = st.columns([3,1])
+                    with col1:
+                        # Show title field - try multiple field names
+                        title = (record.get("fdp_title") or 
+                                record.get("paper_title") or
+                                record.get("workshop_name") or
+                                record.get("title") or
+                                record.get("name") or
+                                "Untitled")
+                        ref_id = record.get("reference_id", "N/A")
+                        date = record.get("start_date") or record.get("date") or record.get("created_at", "")
+                        st.write(f"**{title}**")
+                        st.caption(f"Ref: {ref_id} | Date: {date}")
+                    with col2:
+                        file_url = record.get("file_url")
+                        if file_url:
+                            st.link_button("📄 View Certificate", file_url)
+    
+    if not found_any:
+        # Show ALL records as debug
+        st.warning("No submissions found for your account.")
+        with st.expander("🔍 Debug: All records in Firestore"):
+            for label, collection in collections.items():
+                all_r = get_all_records(collection)
+                st.write(f"{label}: {len(all_r)} total records")
+                if all_r:
+                    st.json(all_r[0])  # show first record structure
+
+
+def show_student_submissions(username):
+    from utils.db import get_all_records
+    from utils.db import STUDENT_HACKATHONS, STUDENT_COMPETITIONS, STUDENT_CERTIFICATIONS
+    
+    collections = {
+        "Hackathons": STUDENT_HACKATHONS,
+        "Competitions": STUDENT_COMPETITIONS,
+        "Certifications": STUDENT_CERTIFICATIONS
+    }
+    
+    found_any = False
+    clean_user = username.lower().replace("fac_", "").replace("stu_", "").replace("_", " ").strip()
+    display_name_clean = st.session_state.get("user_display_name", "").lower().replace("faculty", "").replace("student", "").strip()
+    
+    for label, collection in collections.items():
+        all_records = get_all_records(collection)
+        print(f"DEBUG: {collection} has {len(all_records)} total records")
+        
+        my_records = []
+        for r in all_records:
+            # Check multiple possible field names
+            name_fields = [
+                "student_name", "name", "register_number", 
+                "submitted_by", "username", "email"
+            ]
+            for field in name_fields:
+                val = str(r.get(field, "")).lower().strip()
+                if not val:
+                    continue
+                if (username.lower() in val or 
+                    val in username.lower() or
+                    st.session_state.get("username","").lower() in val or
+                    (clean_user and clean_user in val) or
+                    (display_name_clean and display_name_clean in val) or
+                    (val in display_name_clean)):
+                    my_records.append(r)
+                    break
+        
+        if my_records:
+            found_any = True
+            st.subheader(f"📋 My {label} Submissions ({len(my_records)})")
+            for record in my_records:
+                with st.container():
+                    col1, col2 = st.columns([3,1])
+                    with col1:
+                        title = (record.get("hackathon_name") or 
+                                record.get("event_name") or
+                                record.get("course_title") or
+                                record.get("title") or
+                                record.get("name") or
+                                "Untitled")
+                        ref_id = record.get("reference_id", "N/A")
+                        date = record.get("start_date") or record.get("date") or record.get("created_at", "")
+                        st.write(f"**{title}**")
+                        st.caption(f"Ref: {ref_id} | Date: {date}")
+                    with col2:
+                        file_url = record.get("file_url")
+                        if file_url:
+                            st.link_button("📄 View Certificate", file_url)
+                            
+    if not found_any:
+        st.warning("No submissions found for your account.")
+        with st.expander("🔍 Debug: All records in Firestore"):
+            for label, collection in collections.items():
+                all_r = get_all_records(collection)
+                st.write(f"{label}: {len(all_r)} total records")
+                if all_r:
+                    st.json(all_r[0])  # show first record structure
+
+
 # --- DASHBOARD: FACULTY ---
 def render_faculty_dashboard():
     # Call require_auth at the top
@@ -1244,109 +1456,7 @@ def render_faculty_dashboard():
     st.markdown("### 🔍 Track My Submissions")
     
     with st.expander("My Submissions", expanded=False):
-        search_emp_id = st.text_input("Enter your Employee ID to view submissions", key="search_emp_id")
-        if search_emp_id:
-            search_emp_id_clean = search_emp_id.strip()
-            
-            import utils.db as db
-            
-            # Fetch FDPs
-            fdp_recs = db.get_records_by_field("faculty_fdp", "employee_id", search_emp_id_clean)
-            # Fetch Publications
-            pub_recs = db.get_records_by_field("faculty_publications", "employee_id", search_emp_id_clean)
-            # Fetch Workshops
-            wks_recs = db.get_records_by_field("faculty_workshops", "employee_id", search_emp_id_clean)
-            
-            # Category 1: FDP
-            st.markdown(f"#### 📚 Faculty Development Programs (FDPs) — Total: {len(fdp_recs)}")
-            if fdp_recs:
-                fdp_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Title": r.get("title", ""),
-                    "Date": r.get("start_date", ""),
-                    "Status": r.get("status", "Submitted"),
-                    "Certificate": r.get("file_url") or ""
-                } for r in fdp_recs])
-                
-                st.dataframe(
-                    fdp_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("Download Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No FDP submissions found for this Employee ID.")
-                
-            st.markdown("---")
-            
-            # Category 2: Publications
-            st.markdown(f"#### 📄 Research Publications — Total: {len(pub_recs)}")
-            if pub_recs:
-                pub_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Title": r.get("title", ""),
-                    "Date": r.get("publication_date", ""),
-                    "Status": r.get("status", "Submitted"),
-                    "Certificate": r.get("file_url") or ""
-                } for r in pub_recs])
-                
-                st.dataframe(
-                    pub_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("Download Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No research publications found for this Employee ID.")
-                
-            st.markdown("---")
-            
-            # Category 3: Workshops
-            st.markdown(f"#### 🛠️ Workshops / Seminars — Total: {len(wks_recs)}")
-            if wks_recs:
-                wks_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Title": r.get("title", ""),
-                    "Date": r.get("date", ""),
-                    "Status": r.get("status", "Submitted"),
-                    "Certificate": r.get("file_url") or ""
-                } for r in wks_recs])
-                
-                st.dataframe(
-                    wks_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("Download Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No workshop submissions found for this Employee ID.")
-                
-            st.markdown("---")
-            fac_records = {
-                "FDP": fdp_recs,
-                "Publications": pub_recs,
-                "Workshops": wks_recs
-            }
-            fac_excel_bytes = export_my_records_excel(
-                fac_records,
-                st.session_state.user_display_name,
-                search_emp_id_clean
-            )
-            st.download_button(
-                label="📥 Export My Records (Excel)",
-                data=fac_excel_bytes,
-                file_name=f"faculty_records_{search_emp_id_clean}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="dl_fac_records_btn",
-                use_container_width=True,
-                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, f"Exported faculty records for Employee ID: {search_emp_id_clean}")
-            )
+        show_my_submissions(st.session_state.username)
 
 
 # --- DASHBOARD: STUDENT ---
@@ -1771,111 +1881,7 @@ def render_student_dashboard():
     st.markdown("### 🔍 Track My Submissions")
     
     with st.expander("My Submissions", expanded=False):
-        search_reg_num = st.text_input("Enter your Register Number to view submissions", key="search_reg_num")
-        if search_reg_num:
-            search_reg_clean = search_reg_num.strip()
-            
-            import utils.db as db
-            
-            # Fetch Hackathons
-            hack_recs = db.get_records_by_field("student_hackathons", "register_number", search_reg_clean)
-            # Fetch Competitions
-            comp_recs = db.get_records_by_field("student_competitions", "register_number", search_reg_clean)
-            # Fetch Certifications
-            cert_recs = db.get_records_by_field("student_certifications", "register_number", search_reg_clean)
-            
-            # Category 1: Hackathons
-            st.markdown(f"#### 🏆 Hackathons Participation — Total: {len(hack_recs)}")
-            if hack_recs:
-                hack_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Name": r.get("title", ""),
-                    "Date": r.get("date", ""),
-                    "Result": r.get("rank", "Participant"),
-                    "Certificate": r.get("file_url") or ""
-                } for r in hack_recs])
-                
-                st.dataframe(
-                    hack_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("View Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No hackathon submissions found for this Register Number.")
-                
-            st.markdown("---")
-            
-            # Category 2: Competitions
-            st.markdown(f"#### 🏆 Competitions — Total: {len(comp_recs)}")
-            if comp_recs:
-                comp_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Name": r.get("title", ""),
-                    "Date": r.get("date", ""),
-                    "Result": r.get("result", "Participant"),
-                    "Certificate": r.get("file_url") or ""
-                } for r in comp_recs])
-                
-                st.dataframe(
-                    comp_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("View Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No competition submissions found for this Register Number.")
-                
-            st.markdown("---")
-            
-            # Category 3: Certifications
-            st.markdown(f"#### 🎓 Course Certifications — Total: {len(cert_recs)}")
-            if cert_recs:
-                cert_df = pd.DataFrame([{
-                    "Reference ID": r.get("reference_id", ""),
-                    "Name": r.get("title", ""),
-                    "Date": r.get("date", ""),
-                    "Result": r.get("grade_score") or "Pass",
-                    "Certificate": r.get("file_url") or ""
-                } for r in cert_recs])
-                
-                st.dataframe(
-                    cert_df,
-                    column_config={
-                        "Certificate": st.column_config.LinkColumn("View Certificate", display_text="Open Link")
-                    },
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.info("No course certifications found for this Register Number.")
-                
-            # Download All My Data button (exports Excel file)
-            st.markdown("---")
-            stud_records = {
-                "Hackathons": hack_recs,
-                "Competitions": comp_recs,
-                "Certifications": cert_recs
-            }
-            stud_excel_bytes = export_my_records_excel(
-                stud_records,
-                st.session_state.user_display_name,
-                search_reg_clean
-            )
-            
-            st.download_button(
-                label="📥 Download All My Data (Excel)",
-                data=stud_excel_bytes,
-                file_name=f"student_data_{search_reg_clean}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="dl_stud_data_btn",
-                on_click=lambda: log_event("EXPORT_GENERATED", st.session_state.username, st.session_state.role, f"Exported student data Excel for Register Number: {search_reg_clean}"),
-                use_container_width=True
-            )
+        show_student_submissions(st.session_state.username)
 
 
 

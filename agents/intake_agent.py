@@ -121,8 +121,24 @@ def run_intake_agent(entry_type: str, data_dict: dict, username: str) -> str:
     user_tracker["count"] += 1
     st.session_state.submissions_tracker[actual_username] = user_tracker
     
-    # Call the actual agent
-    response = asyncio.run(_run_agent_async(entry_type, data_dict, username))
+    # Initialize the flag before calling the agent
+    st.session_state["_last_saved_success"] = False
+    
+    try:
+        # Call the actual agent
+        response = asyncio.run(_run_agent_async(entry_type, data_dict, username))
+    except Exception as e:
+        print(f"Intake Agent error (likely API quota or connection issue): {e}")
+        response = f"The intake assistant encountered an API/connection error ({e}), but your data is being securely saved via database fallback."
+        
+    # Check if the record was saved by the agent
+    if not st.session_state.get("_last_saved_success"):
+        print("Fallback database save triggered.")
+        save_res = save_entry(entry_type, data_dict)
+        if save_res.get("success"):
+            response += f"\n\n[System Fallback]: Record successfully saved with Ref ID: {save_res.get('reference_id')}"
+        else:
+            response += "\n\n[System Fallback]: Failed to save record to database."
     
     # Log success
     log_event("DATA_SUBMITTED", actual_username, role, f"Intake submission of type '{entry_type}' succeeded")
