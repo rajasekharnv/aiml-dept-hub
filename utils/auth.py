@@ -67,6 +67,47 @@ def login_page():
     """
     Renders a centered card layout login page with logo and credentials fields.
     """
+    # Inject Light Theme CSS overrides directly on the login page to guarantee styling
+    st.markdown("""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        * {
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6, p, span, li, label, [data-testid="stWidgetLabel"] p {
+            color: #0f172a !important;
+        }
+        
+        div[data-baseweb="input"], textarea {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+        }
+        
+        div[data-baseweb="input"] input, textarea {
+            color: #0f172a !important;
+            -webkit-text-fill-color: #0f172a !important;
+        }
+        
+        button[kind="primary"] {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 10px 24px !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
         <div style='text-align: center; margin-top: 1rem;'>
             <span style='font-size: 4.5rem; filter: drop-shadow(0 4px 10px rgba(79,70,229,0.15));'>🎓</span>
@@ -83,7 +124,7 @@ def login_page():
             # Remove it so it doesn't persist forever
             del st.session_state["auth_message"]
 
-        st.markdown("<div style='background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);'>", unsafe_allow_html=True)
+        st.markdown("<div style='background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);'>", unsafe_allow_html=True)
         st.write("### Sign In")
         
         login_user = st.text_input("Username", placeholder="e.g. hod_aiml, fac_smith, stu_roberts")
@@ -114,13 +155,11 @@ def login_page():
         
         # Info box explaining credential formats
         st.markdown("""
-            <div style='margin-top: 1.5rem; font-size: 0.85rem; color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.2rem;'>
-                <strong style="color: #0f172a;">🔑 Demo Credentials (Password: <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">AIML@2024</code>)</strong><br>
-                <div style="margin-top: 8px; line-height: 1.5;">
-                    • HoD: <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">hod_aiml</code><br>
-                    • Faculty: usernames starting with <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">fac_</code> (e.g. <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">fac_john</code>)<br>
-                    • Student: usernames starting with <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">stu_</code> (e.g. <code style="background:#e2e8f0; color:#0f172a; padding:2px 4px; border-radius:4px;">stu_grace</code>)
-                </div>
+            <div style='margin-top: 1.5rem; font-size: 0.85rem; color: #94a3b8; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 8px; padding: 1rem;'>
+                <strong>🔑 Demo Credentials (Password: <code>AIML@2024</code>)</strong><br>
+                • HoD: <code>hod_aiml</code><br>
+                • Faculty: usernames starting with <code>fac_</code> (e.g. <code>fac_john</code>)<br>
+                • Student: usernames starting with <code>stu_</code> (e.g. <code>stu_grace</code>)
             </div>
         """, unsafe_allow_html=True)
 

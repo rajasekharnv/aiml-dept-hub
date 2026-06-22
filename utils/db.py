@@ -1,6 +1,5 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
-from google.cloud.firestore import FieldFilter
 import streamlit as st
 import json
 from datetime import datetime
@@ -84,7 +83,6 @@ def save_record(collection: str, data_dict: dict) -> str:
     doc_ref.set(record)
     return doc_ref.id
 
-@st.cache_data(ttl=60)
 def get_all_records(collection: str) -> list[dict]:
     """
     Returns all non-deleted documents in the collection, with doc_id included.
@@ -99,13 +97,13 @@ def get_all_records(collection: str) -> list[dict]:
         records = []
         for doc in docs:
             data = doc.to_dict()
+            # Filter out soft-deleted records locally to avoid Firestore index requirements
             if data.get("deleted_at") is None:
                 data["doc_id"] = doc.id
                 records.append(data)
-        print(f"DEBUG get_all_records({collection}): {len(records)} records found")
         return records
     except Exception as e:
-        print(f"ERROR get_all_records({collection}): {e}")
+        st.error(f"Error fetching records from {collection}: {e}")
         return []
 
 def get_records_by_field(collection: str, field: str, value) -> list[dict]:
@@ -118,29 +116,17 @@ def get_records_by_field(collection: str, field: str, value) -> list[dict]:
         return []
         
     try:
-        # Try exact match first
-        docs = db.collection(collection).where(
-            filter=FieldFilter(field, "==", value)
-        ).stream()
+        # Perform query filter on the field
+        docs = db.collection(collection).where(field, "==", value).stream()
         records = []
         for doc in docs:
             data = doc.to_dict()
             if data.get("deleted_at") is None:
                 data["doc_id"] = doc.id
                 records.append(data)
-        
-        # If no results, try case-insensitive by fetching all
-        if not records:
-            all_records = get_all_records(collection)
-            records = [
-                r for r in all_records 
-                if str(r.get(field, "")).lower() == str(value).lower()
-            ]
-        
-        print(f"DEBUG get_records_by_field({collection}, {field}, {value}): {len(records)} found")
         return records
     except Exception as e:
-        print(f"Error in get_records_by_field: {e}")
+        st.error(f"Error filtering records in {collection} by {field}: {e}")
         return []
 
 def check_duplicate(collection: str, field: str, value) -> bool:
@@ -151,7 +137,6 @@ def check_duplicate(collection: str, field: str, value) -> bool:
     records = get_records_by_field(collection, field, value)
     return len(records) > 0
 
-@st.cache_data(ttl=60)
 def get_count(collection: str) -> int:
     """
     Returns the count of non-soft-deleted documents in the collection.
@@ -171,11 +156,6 @@ def delete_record(collection: str, doc_id: str):
     doc_ref.update({
         "deleted_at": datetime.now()
     })
-    try:
-        import streamlit as st
-        st.cache_data.clear()
-    except Exception:
-        pass
 
 def update_record(collection: str, doc_id: str, updates: dict):
     """
@@ -188,11 +168,6 @@ def update_record(collection: str, doc_id: str, updates: dict):
     doc_ref = db.collection(collection).document(doc_id)
     updates["updated_at"] = datetime.now()
     doc_ref.update(updates)
-    try:
-        import streamlit as st
-        st.cache_data.clear()
-    except Exception:
-        pass
 
 def generate_reference_id(entry_type: str) -> str:
     """
@@ -235,14 +210,6 @@ def save_entry(collection: str, data: dict) -> dict:
         ref_id = record["reference_id"]
         doc_id = save_record(collection, record)
         
-        # Mark as saved in Streamlit session state if available
-        try:
-            import streamlit as st
-            st.session_state["_last_saved_success"] = True
-            st.cache_data.clear()
-        except Exception:
-            pass
-            
         return {
             "success": True,
             "doc_id": doc_id,
@@ -255,4 +222,5 @@ def save_entry(collection: str, data: dict) -> dict:
             "doc_id": "",
             "reference_id": ""
         }
+
 
