@@ -107,38 +107,37 @@ def login_page():
         }
 
         /* Centered White Login Card */
-        div[data-testid="stForm"] {
+        [data-testid="stForm"] {
             background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
             border-radius: 16px !important;
-            padding: 2.5rem !important;
+            padding: 3rem 2.5rem !important;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+            margin-top: 8vh !important;
+            margin-bottom: 8vh !important;
         }
 
+        /* Access Hub Button with Coral/Red Color #D85A30 */
         button[data-testid="stFormSubmitButton"] {
-            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+            background-color: #D85A30 !important;
+            background-image: none !important;
             color: #ffffff !important;
             font-weight: 700 !important;
             border: none !important;
             border-radius: 12px !important;
-            padding: 10px 24px !important;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
+            padding: 12px 24px !important;
+            box-shadow: 0 4px 14px rgba(216, 90, 48, 0.25) !important;
             transition: all 0.2s ease-in-out !important;
+            width: 100% !important;
         }
         
         button[data-testid="stFormSubmitButton"]:hover {
             transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35) !important;
+            box-shadow: 0 6px 20px rgba(216, 90, 48, 0.35) !important;
+            background-color: #c44f28 !important;
+            background-image: none !important;
         }
         </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-        <div style='text-align: center; margin-top: 1rem;'>
-            <span style='font-size: 4.5rem; filter: drop-shadow(0 4px 10px rgba(79,70,229,0.15));'>🎓</span>
-            <h2 style='margin-top: 0.5rem; font-weight: 800; color: #0f172a;'>AIML Intelligence Hub</h2>
-            <p style='color: #475569; font-size: 0.95rem; margin-bottom: 2rem;'>Department of Artificial Intelligence & Machine Learning</p>
-        </div>
     """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -150,12 +149,21 @@ def login_page():
             del st.session_state["auth_message"]
 
         with st.form(key="login_form"):
-            st.markdown("<h3 style='margin-top: 0; margin-bottom: 1.5rem; font-weight: 700; color: #0f172a;'>Sign In</h3>", unsafe_allow_html=True)
+            # Logo, Title, Subtitle, Divider, and Sign In heading inside the form card
+            st.markdown("""
+                <div style='text-align: center;'>
+                    <span style='font-size: 4rem; filter: drop-shadow(0 4px 10px rgba(216, 90, 48, 0.15));'>🎓</span>
+                    <h2 style='margin-top: 0.5rem; font-weight: 800; color: #0f172a; font-size: 1.8rem; line-height: 1.2;'>AIML Intelligence Hub</h2>
+                    <p style='color: #475569; font-size: 0.9rem; margin-top: 0.25rem; margin-bottom: 1.5rem;'>Department of Artificial Intelligence & Machine Learning</p>
+                    <hr style='border: 0; border-top: 1px solid #cbd5e1; margin: 1.5rem 0;'>
+                    <h3 style='margin-top: 0; margin-bottom: 1.5rem; font-weight: 700; color: #0f172a; text-align: left;'>Sign In</h3>
+                </div>
+            """, unsafe_allow_html=True)
             
             login_user = st.text_input("Username", placeholder="e.g. hod_aiml, fac_smith, stu_roberts")
             login_pass = st.text_input("Password", type="password", placeholder="Password")
             
-            submit_btn = st.form_submit_button("Access Hub", use_container_width=True, type="primary")
+            submit_btn = st.form_submit_button("Access Hub", use_container_width=True)
             if submit_btn:
                 user_info = authenticate_user(login_user, login_pass)
                 if user_info:
@@ -176,16 +184,21 @@ def login_page():
                 else:
                     st.error("Invalid username or password.")
                     log_event("LOGIN_FAILED", login_user or "unknown", "Guest", "Invalid credentials provided")
+            
+            # Info box explaining credential formats inside the form card
+            st.markdown("""
+                <div style='margin-top: 1.5rem; font-size: 0.85rem; color: #475569; background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1.25rem;'>
+                    <strong style='color: #0f172a; font-size: 0.9rem;'>🔑 Demo Login Accounts</strong><br>
+                    <div style='margin-top: 0.5rem; display: flex; flex-direction: column; gap: 4px; color: #334155;'>
+                        <div><strong>• Head of Department (HoD):</strong> <code>hod_aiml</code></div>
+                        <div><strong>• Faculty Member:</strong> <code>fac_turing</code></div>
+                        <div><strong>• Student User:</strong> <code>stu_grace</code></div>
+                        <div style='margin-top: 0.4rem; border-top: 1px solid #e2e8f0; padding-top: 0.4rem;'><strong>Password for all:</strong> <code>AIML@2024</code></div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
         
-        # Info box explaining credential formats
-        st.markdown("""
-            <div style='margin-top: 1.5rem; font-size: 0.85rem; color: #94a3b8; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 8px; padding: 1rem;'>
-                <strong>🔑 Demo Credentials (Password: <code>AIML@2024</code>)</strong><br>
-                • HoD: <code>hod_aiml</code><br>
-                • Faculty: usernames starting with <code>fac_</code> (e.g. <code>fac_john</code>)<br>
-                • Student: usernames starting with <code>stu_</code> (e.g. <code>stu_grace</code>)
-            </div>
-        """, unsafe_allow_html=True)
+
 
 def logout(message: str = None):
     """

@@ -7,6 +7,41 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 # =====================================================================
+# GLOBAL MONKEYPATCH: SANITIZE TIMEZONES FOR EXCEL EXPORT
+# =====================================================================
+_original_to_excel = pd.DataFrame.to_excel
+
+def _patched_to_excel(self, *args, **kwargs):
+    df_clean = self.copy()
+    
+    if isinstance(df_clean.index, pd.DatetimeIndex) and df_clean.index.tz is not None:
+        df_clean.index = df_clean.index.tz_localize(None)
+        
+    for col in df_clean.columns:
+        if pd.api.types.is_datetime64_any_dtype(df_clean[col]):
+            if hasattr(df_clean[col].dt, "tz") and df_clean[col].dt.tz is not None:
+                try:
+                    df_clean[col] = df_clean[col].dt.tz_localize(None)
+                except Exception:
+                    try:
+                        df_clean[col] = df_clean[col].dt.tz_convert(None).dt.tz_localize(None)
+                    except Exception:
+                        pass
+        else:
+            def make_tz_unaware(val):
+                if hasattr(val, "tzinfo") and val.tzinfo is not None:
+                    try:
+                        return val.replace(tzinfo=None)
+                    except Exception:
+                        return str(val)
+                return val
+            df_clean[col] = df_clean[col].apply(make_tz_unaware)
+            
+    return _original_to_excel(df_clean, *args, **kwargs)
+
+pd.DataFrame.to_excel = _patched_to_excel
+
+# =====================================================================
 # BACKWARDS COMPATIBILITY EXPORTS
 # =====================================================================
 
