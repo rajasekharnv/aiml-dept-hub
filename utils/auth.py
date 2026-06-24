@@ -105,6 +105,31 @@ def login_page():
             padding: 10px 24px !important;
             box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
         }
+
+        /* Centered White Login Card */
+        div[data-testid="stForm"] {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            padding: 2.5rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        button[data-testid="stFormSubmitButton"] {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 10px 24px !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        button[data-testid="stFormSubmitButton"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35) !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -124,34 +149,33 @@ def login_page():
             # Remove it so it doesn't persist forever
             del st.session_state["auth_message"]
 
-        st.markdown("<div style='background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);'>", unsafe_allow_html=True)
-        st.write("### Sign In")
-        
-        login_user = st.text_input("Username", placeholder="e.g. hod_aiml, fac_smith, stu_roberts")
-        login_pass = st.text_input("Password", type="password", placeholder="Password")
-        
-        if st.button("Access Hub", use_container_width=True, type="primary"):
-            user_info = authenticate_user(login_user, login_pass)
-            if user_info:
-                st.session_state["authenticated"] = True
-                st.session_state["role"] = user_info["role"]
-                st.session_state["username"] = user_info["username"]
-                st.session_state["user_display_name"] = user_info["display_name"]
-                st.session_state["login_time"] = datetime.now()
-                st.session_state["last_active"] = datetime.now()
-                
-                # Persist session in query parameters
-                st.query_params["user"] = user_info["username"]
-                st.query_params["role"] = user_info["role"]
-                
-                log_event("LOGIN_SUCCESS", user_info["username"], user_info["role"], f"Successful login as {user_info['role']}")
-                st.success("Login successful! Loading dashboard...")
-                st.rerun()
-            else:
-                st.error("Invalid username or password.")
-                log_event("LOGIN_FAILED", login_user or "unknown", "Guest", "Invalid credentials provided")
-                
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.form(key="login_form"):
+            st.markdown("<h3 style='margin-top: 0; margin-bottom: 1.5rem; font-weight: 700; color: #0f172a;'>Sign In</h3>", unsafe_allow_html=True)
+            
+            login_user = st.text_input("Username", placeholder="e.g. hod_aiml, fac_smith, stu_roberts")
+            login_pass = st.text_input("Password", type="password", placeholder="Password")
+            
+            submit_btn = st.form_submit_button("Access Hub", use_container_width=True, type="primary")
+            if submit_btn:
+                user_info = authenticate_user(login_user, login_pass)
+                if user_info:
+                    st.session_state["authenticated"] = True
+                    st.session_state["role"] = user_info["role"]
+                    st.session_state["username"] = user_info["username"]
+                    st.session_state["user_display_name"] = user_info["display_name"]
+                    st.session_state["login_time"] = datetime.now()
+                    st.session_state["last_active"] = datetime.now()
+                    
+                    # Persist session in query parameters
+                    st.query_params["user"] = user_info["username"]
+                    st.query_params["role"] = user_info["role"]
+                    
+                    log_event("LOGIN_SUCCESS", user_info["username"], user_info["role"], f"Successful login as {user_info['role']}")
+                    st.success("Login successful! Loading dashboard...")
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password.")
+                    log_event("LOGIN_FAILED", login_user or "unknown", "Guest", "Invalid credentials provided")
         
         # Info box explaining credential formats
         st.markdown("""
