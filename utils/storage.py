@@ -1,5 +1,5 @@
-import firebase_admin
-from firebase_admin import storage
+import firebase_admin  # type: ignore
+from firebase_admin import storage  # type: ignore
 import streamlit as st
 import os
 import re
