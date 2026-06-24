@@ -1,10 +1,57 @@
 import pandas as pd
 import io
+import unicodedata
 from datetime import datetime
 from fpdf import FPDF
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+
+# =====================================================================
+# UNICODE TO ASCII SANITIZATION HELPER
+# =====================================================================
+
+def sanitize_text(text: str) -> str:
+    """
+    Sanitizes Unicode special characters (em dashes, smart quotes, bullets, ellipses, etc.)
+    by replacing them with their ASCII equivalents and normalization to avoid FPDF encoding exceptions.
+    """
+    if text is None:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
+        
+    # Common Unicode character mappings to ASCII equivalents
+    replacements = {
+        "\u2014": "-",   # em dash
+        "\u2013": "-",   # en dash
+        "\u201c": '"',   # smart left double quote
+        "\u201d": '"',   # smart right double quote
+        "\u2018": "'",   # smart left single quote
+        "\u2019": "'",   # smart right single quote
+        "\u2022": "*",   # bullet
+        "\u2026": "...", # ellipsis
+        "\u00a0": " ",   # non-breaking space
+        "\u2212": "-",   # minus sign
+        "\u2122": "(TM)",
+        "\u00ae": "(R)",
+        "\u00a9": "(C)",
+        "\u2032": "'",   # prime
+        "\u2033": '"',   # double prime
+        "\u201b": "'",   # reversed single quote
+        "\u201f": '"',   # reversed double quote
+        "\u201a": "'",   # single low-9 quote
+        "\u201e": '"',   # double low-9 quote
+    }
+    
+    for uni_char, ascii_char in replacements.items():
+        text = text.replace(uni_char, ascii_char)
+        
+    # Normalize to NFKD to decompose accented characters (e.g. é -> e)
+    normalized = unicodedata.normalize('NFKD', text)
+    # Encode to ASCII, ignoring any remaining unsupported characters, and decode back to string
+    return normalized.encode('ascii', 'ignore').decode('ascii')
+
 
 # =====================================================================
 # GLOBAL MONKEYPATCH: SANITIZE TIMEZONES FOR EXCEL EXPORT
@@ -72,13 +119,13 @@ def export_to_pdf(title: str, content: list[str]) -> bytes:
     
     # Title
     pdf.set_font("Helvetica", style="B", size=16)
-    pdf.cell(0, 10, title, new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.cell(0, 10, sanitize_text(title), new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.ln(10)
     
     # Body text
     pdf.set_font("Helvetica", size=12)
     for paragraph in content:
-        pdf.multi_cell(0, 10, paragraph)
+        pdf.multi_cell(0, 10, sanitize_text(paragraph))
         pdf.ln(5)
         
     # Output bytes
@@ -98,23 +145,24 @@ class DepartmentReportPDF(FPDF):
     """
     def __init__(self, title: str, generated_by: str):
         super().__init__()
-        self.report_title = title
-        self.generated_by = generated_by
+        self.report_title = sanitize_text(title)
+        self.generated_by = sanitize_text(generated_by)
         self.generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.set_title(self.report_title)
 
     def header(self):
         # Header title
         self.set_font("Helvetica", "B", 10)
         self.set_text_color(100, 110, 120)
-        self.cell(0, 5, "Department of Artificial Intelligence & Machine Learning", new_x="LMARGIN", new_y="NEXT", align="L")
+        self.cell(0, 5, sanitize_text("Department of Artificial Intelligence & Machine Learning"), new_x="LMARGIN", new_y="NEXT", align="L")
         
         self.set_font("Helvetica", "B", 14)
         self.set_text_color(15, 23, 42)
-        self.cell(0, 7, self.report_title, new_x="LMARGIN", new_y="NEXT", align="L")
+        self.cell(0, 7, sanitize_text(self.report_title), new_x="LMARGIN", new_y="NEXT", align="L")
         
         self.set_font("Helvetica", "I", 9)
         self.set_text_color(148, 163, 184)
-        self.cell(0, 5, f"Generated: {self.generated_at} | By: {self.generated_by}", new_x="LMARGIN", new_y="NEXT", align="L")
+        self.cell(0, 5, sanitize_text(f"Generated: {self.generated_at} | By: {self.generated_by}"), new_x="LMARGIN", new_y="NEXT", align="L")
         self.ln(3)
         
         # Separator line
@@ -127,7 +175,25 @@ class DepartmentReportPDF(FPDF):
         self.set_y(-15)
         self.set_font("Helvetica", "I", 8)
         self.set_text_color(148, 163, 184)
-        self.cell(0, 10, f"Confidential — AIML Dept | Page {self.page_no()}/{{nb}}", align="C")
+        self.cell(0, 10, sanitize_text(f"Confidential — AIML Dept | Page {self.page_no()}/{{nb}}"), align="C")
+
+    # Overridden methods to automatically sanitize text inputs
+    def cell(self, w, h=0, txt="", *args, **kwargs):
+        if "text" in kwargs:
+            kwargs["text"] = sanitize_text(kwargs["text"])
+        else:
+            txt = sanitize_text(txt)
+        return super().cell(w, h, txt, *args, **kwargs)
+
+    def multi_cell(self, w, h=0, txt="", *args, **kwargs):
+        if "text" in kwargs:
+            kwargs["text"] = sanitize_text(kwargs["text"])
+        else:
+            txt = sanitize_text(txt)
+        return super().multi_cell(w, h, txt, *args, **kwargs)
+
+    def set_title(self, title: str, *args, **kwargs):
+        return super().set_title(sanitize_text(title), *args, **kwargs)
 
 def render_pdf_table(pdf: FPDF, table_rows: list[list[str]]):
     """
@@ -151,7 +217,7 @@ def render_pdf_table(pdf: FPDF, table_rows: list[list[str]]):
         for col_idx in range(cols_count):
             val = row[col_idx].strip() if col_idx < len(row) else ""
             val = val.replace("**", "").replace("__", "")
-            val = val.encode("ascii", "ignore").decode("ascii")
+            val = sanitize_text(val)
             pdf.cell(col_width, max_h, val, border=1, align="C", fill=True)
         pdf.ln(max_h)
     pdf.ln(4)
@@ -172,7 +238,7 @@ def write_markdown_line(pdf: FPDF, line_text: str, default_size: int = 10):
         
         pdf.set_font("Helvetica", style="B", size=default_size + size_boost)
         pdf.set_text_color(15, 23, 42)
-        pdf.multi_cell(0, 8, heading_text)
+        pdf.multi_cell(0, 8, sanitize_text(heading_text))
         pdf.ln(2)
         return
 
@@ -187,7 +253,7 @@ def write_markdown_line(pdf: FPDF, line_text: str, default_size: int = 10):
 
     if is_bullet:
         pdf.set_x(15)
-        pdf.write(5, "•  ")
+        pdf.write(5, "*  ")
 
     # Inline Bold Parser (**text**)
     parts = text.split("**")
@@ -198,7 +264,7 @@ def write_markdown_line(pdf: FPDF, line_text: str, default_size: int = 10):
         else:
             pdf.set_font("Helvetica", style="", size=default_size)
         
-        cleaned_part = part.encode("ascii", "ignore").decode("ascii")
+        cleaned_part = sanitize_text(part)
         pdf.write(5, cleaned_part)
         
     pdf.ln(6)
@@ -208,6 +274,11 @@ def generate_pdf_report(title: str, content_markdown: str, metadata: dict) -> by
     Create FPDF object, set margins, parse markdown and return PDF bytes.
     """
     generated_by = metadata.get("generated_by", "Head of Department")
+    
+    # Pre-sanitize high-level input parameters
+    title = sanitize_text(title)
+    content_markdown = sanitize_text(content_markdown)
+    generated_by = sanitize_text(generated_by)
     
     pdf = DepartmentReportPDF(title, generated_by)
     pdf.alias_nb_pages()
@@ -499,76 +570,6 @@ def export_my_records_excel(records: dict, user_name: str, user_id: str) -> byte
             col_letter = get_column_letter(col[0].column)
             ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
             
-    excel_out = io.BytesIO()
-    wb.save(excel_out)
-    return excel_out.getvalue()
-
-    white_font  = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
-    bold_font   = Font(name="Calibri", size=11, bold=True)
-    normal_font = Font(name="Calibri", size=11)
-
-    thin_border = Border(
-        left=Side(style="thin", color="CBD5E1"),
-        right=Side(style="thin", color="CBD5E1"),
-        top=Side(style="thin", color="CBD5E1"),
-        bottom=Side(style="thin", color="CBD5E1"),
-    )
-
-    records_dict = {"My Submissions": records} if isinstance(records, list) else records
-
-    for sheet_name, rec_list in records_dict.items():
-        ws = wb.create_sheet(title=str(sheet_name)[:30])
-
-        if not rec_list:
-            headers   = ["Message"]
-            data_rows = [["No personal records found"]]
-        else:
-            all_keys = []
-            for r in rec_list:
-                for k in r.keys():
-                    if k not in all_keys and k != "doc_id":
-                        all_keys.append(k)
-            headers   = all_keys
-            data_rows = [[r.get(h, "") for h in headers] for r in rec_list]
-
-        last_col_letter = get_column_letter(max(len(headers), 3))
-
-        ws.merge_cells(f"A1:{last_col_letter}1")
-        ws["A1"] = "Department of Artificial Intelligence & Machine Learning"
-        ws["A1"].font  = white_font
-        ws["A1"].fill  = blue_fill
-        ws["A1"].alignment = Alignment(horizontal="center")
-
-        ws["A2"] = f"Personal Export: {user_name} ({user_id})"
-        ws["A2"].font = bold_font
-        ws["B2"] = f"Export Date: {datetime.now().strftime('%Y-%m-%d')}"
-        ws["B2"].font = bold_font
-
-        for col_idx, h in enumerate(headers, 1):
-            cell = ws.cell(row=3, column=col_idx, value=str(h).replace("_", " ").title())
-            cell.font   = bold_font
-            cell.fill   = header_fill
-            cell.border = thin_border
-
-        for r_idx, row in enumerate(data_rows, 4):
-            for c_idx, val in enumerate(row, 1):
-                val_str = val.strftime("%Y-%m-%d %H:%M:%S") if isinstance(val, datetime) else str(val)
-                cell = ws.cell(row=r_idx, column=c_idx, value=val_str)
-                cell.font   = normal_font
-                cell.border = thin_border
-                if r_idx % 2 == 1:
-                    cell.fill = zebra_fill
-
-        ws.freeze_panes = "A4"
-
-        for col in ws.columns:
-            max_len = max(
-                (len(str(cell.value or "")) for cell in col if cell.row != 1),
-                default=0,
-            )
-            col_letter = get_column_letter(col[0].column)
-            ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
-
     excel_out = io.BytesIO()
     wb.save(excel_out)
     return excel_out.getvalue()

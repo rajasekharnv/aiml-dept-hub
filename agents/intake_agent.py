@@ -26,7 +26,7 @@ If data is missing or invalid, clearly ask for the specific missing information.
 # Instantiate the ADK Agent
 intake_assistant = Agent(
     name="intake_assistant",
-    model="gemini-2.0-flash",
+    model="gemini-flash-lite-latest",
     instruction=SYSTEM_INSTRUCTION,
     tools=[validate_tool, duplicate_tool, save_tool, generate_id_tool]
 )

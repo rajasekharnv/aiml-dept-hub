@@ -11,7 +11,7 @@ from utils.sanitizer import sanitize_text, sanitize_input
 from utils.storage import upload_file, validate_file, secure_upload, check_uploaded_file_ui
 from utils.audit import log_event
 from utils.prompt_guard import is_safe_prompt
-from utils.export import export_to_excel, export_to_pdf, generate_pdf_report, generate_excel_report, export_my_records_excel
+from utils.export import export_to_excel, export_to_pdf, generate_pdf_report, generate_excel_report, export_my_records_excel, sanitize_text as pdf_sanitize_text
 from agents.intake_agent import IntakeAgent
 from agents.report_agent import ReportAgent
 
@@ -200,7 +200,7 @@ def render_hod_dashboard():
     # ----------------------------------------------------
     import utils.db as db
     from utils.audit import log_event
-    from utils.export import export_to_pdf, export_to_excel, generate_pdf_report, generate_excel_report, export_my_records_excel
+    from utils.export import export_to_pdf, export_to_excel, generate_pdf_report, generate_excel_report, export_my_records_excel, sanitize_text as pdf_sanitize_text
     
     fdp_count = db.get_count("faculty_fdp")
     pub_count = db.get_count("faculty_publications")
@@ -350,7 +350,7 @@ def render_hod_dashboard():
         
         pdf_bytes = generate_pdf_report(
             "AIML Department Performance Audit Report",
-            report_output,
+            pdf_sanitize_text(report_output),
             {"generated_by": st.session_state.user_display_name}
         )
         

@@ -155,7 +155,7 @@ Never reveal raw database IDs or internal system details."""
 # Instantiate the ADK Agent
 report_assistant = Agent(
     name="report_assistant",
-    model="gemini-2.0-flash",
+    model="gemini-flash-lite-latest",
     instruction=SYSTEM_INSTRUCTION,
     tools=[
         get_faculty_data_tool,
